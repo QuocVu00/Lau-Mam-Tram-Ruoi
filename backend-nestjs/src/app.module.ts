@@ -17,8 +17,9 @@ import { PrismaModule } from './prisma/prisma.module';
 
 // ============================================================================
 // [KHU VỰC DÀNH CHO THÀNH VIÊN B IMPORT MODULES]
-// import { BranchesModule } from './modules/branches/branches.module';
-// import { BookingsModule } from './modules/bookings/bookings.module';
+import { BranchesModule } from './modules/branches/branches.module';
+import { UsersModule } from './modules/users/users.module';
+import { BookingsModule } from './modules/bookings/bookings.module';
 // ============================================================================
 
 @Module({
@@ -42,9 +43,9 @@ import { PrismaModule } from './prisma/prisma.module';
 
     // ------------------------------------------------------------------------
     // 🔵 [MODULES CỦA THÀNH VIÊN B] - Thành viên B thêm module của họ tại đây:
-    // BranchesModule,
-    // UsersModule,
-    // BookingsModule,
+    BranchesModule,
+    UsersModule,
+    BookingsModule,
     // ------------------------------------------------------------------------
   ],
 })
