@@ -1,0 +1,179 @@
+// ============================================================================
+// File: backend-nestjs/prisma/schema.prisma
+// Dự án: Lẩu Mắm Trăm Rưỡi (MVP)
+// Mục tiêu: Khóa cứng cấu trúc 6 bảng PostgreSQL dùng chung cho Thành viên A & B
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// 1. CÁC KIỂU LIỆT KÊ (ENUMS) DÙNG CHUNG TOÀN HỆ THỐNG
+// ============================================================================
+
+// Phân quyền 3 vai trò trong hệ thống
+enum Role {
+  CUSTOMER // Role 1: Khách vãng lai đăng nhập Google One Tap
+  MANAGER  // Role 2: Quản lý chi nhánh do Admin cấp tài khoản
+  ADMIN    // Role 3: Quản trị viên tối cao của toàn chuỗi
+}
+
+// Trạng thái bài đánh giá
+enum ReviewStatus {
+  ACTIVE             // Đang hiển thị và ĐƯỢC tính vào điểm trung bình sao
+  DELETED_BY_MANAGER // Đã bị Quản lý xóa (vẫn lưu trong DB nhưng KHÔNG tính điểm sao nữa)
+}
+
+// Loại tương tác vào bài đánh giá
+enum InteractionType {
+  REPLY    // Trả lời bình luận
+  REACTION // Thả biểu tượng cảm xúc (Like, Thả tim, Ngon miệng...)
+}
+
+// Loại đơn đặt của khách hàng
+enum BookingType {
+  BOOK_TABLE // Khách đặt bàn ăn tại quán
+  TAKEAWAY   // Khách đặt mang về
+}
+
+// Trạng thái xử lý đơn đặt bàn
+enum BookingStatus {
+  NEW       // Đơn mới gửi từ khách (chờ Quản lý xác nhận)
+  CONFIRMED // Quản lý đã liên hệ Zalo xác nhận
+  DONE      // Đã hoàn tất phục vụ
+}
+
+// ============================================================================
+// 2. CÁC BẢNG DO THÀNH VIÊN B CHỦ TRÌ (3 BẢNG)
+// ============================================================================
+
+/// Bảng 1: Thông tin Chi nhánh
+/// Thành viên B quản lý CRUD; Thành viên A tự động cập nhật avgRating & totalActiveReviews
+model Branch {
+  id                 String   @id @default(uuid())
+  name               String   // Tên chi nhánh (VD: Chi nhánh Quận 1)
+  address            String   // Địa chỉ quán
+  phone              String   // Số điện thoại hotline của chi nhánh
+  avgRating          Float    @default(0) @map("avg_rating")           // Điểm trung bình sao (1.0 -> 5.0)
+  totalActiveReviews Int      @default(0) @map("total_active_reviews") // Tổng số bài đánh giá hợp lệ
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  // Các mối quan hệ liên kết bảng
+  users        User[]
+  reviews      Review[]
+  deletionLogs ReviewDeletionLog[]
+  bookings     BookingOrder[]
+
+  @@map("branches")
+}
+
+/// Bảng 2: Tài khoản Người dùng (3 Roles)
+/// Thành viên A xử lý Auth (Google One Tap & Login); Thành viên B quản lý tạo tài khoản Quản lý
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String?  @map("password_hash") // Null nếu là CUSTOMER (đăng nhập bằng Google)
+  fullName     String   @map("full_name")     // Họ và tên
+  avatarUrl    String?  @map("avatar_url")    // Ảnh đại diện
+  role         Role     @default(CUSTOMER)    // Mặc định là Khách vãng lai
+  branchId     String?  @map("branch_id")     // Bắt buộc có nếu role == MANAGER
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Quan hệ: Quản lý thuộc về 1 chi nhánh
+  branch       Branch?             @relation(fields: [branchId], references: [id])
+  reviews      Review[]
+  interactions ReviewInteraction[]
+  deletedLogs  ReviewDeletionLog[] @relation("ManagerDeletedLogs")
+  bookings     BookingOrder[]
+
+  @@map("users")
+}
+
+/// Bảng 6: Đơn Đặt bàn & Mua mang về qua Zalo
+/// Thành viên B phụ trách toàn bộ
+model BookingOrder {
+  id           String        @id @default(uuid())
+  branchId     String        @map("branch_id")
+  userId       String?       @map("user_id") // Có thể null nếu khách đặt nhanh không đăng nhập
+  customerName String        @map("customer_name")
+  zaloPhone    String        @map("zalo_phone")   // Số điện thoại dùng Zalo để quán liên hệ
+  guestCount   Int           @default(1) @map("guest_count")
+  type         BookingType                        // Đặt bàn hay Mang về
+  details      String?                            // Ghi chú thêm (VD: Cần ghế trẻ em)
+  status       BookingStatus @default(NEW)
+  createdAt    DateTime      @default(now()) @map("created_at")
+
+  branch Branch @relation(fields: [branchId], references: [id])
+  user   User?  @relation(fields: [userId], references: [id])
+
+  @@map("bookings_orders")
+}
+
+// ============================================================================
+// 3. CÁC BẢNG DO THÀNH VIÊN A CHỦ TRÌ (3 BẢNG QUAN TRỌNG NHẤT CỦA BẠN)
+// ============================================================================
+
+/// Bảng 3: Bài đánh giá của khách
+/// @author Thanh Vien A
+model Review {
+  id        String       @id @default(uuid())
+  branchId  String       @map("branch_id")
+  userId    String       @map("user_id")
+  rating    Int          // Số biểu tượng đánh giá từ 1 đến 5 sao
+  content   String       // Nội dung nhận xét
+  mediaUrls Json         @default("[]") @map("media_urls") // Mảng JSON chứa link ảnh WebP & video HLS
+  isEdited  Boolean      @default(false) @map("is_edited") // Bật true nếu khách từng sửa bài
+  status    ReviewStatus @default(ACTIVE)                  // ACTIVE: hiện; DELETED_BY_MANAGER: bị Quản lý xóa
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+
+  // Liên kết khóa ngoại
+  branch       Branch              @relation(fields: [branchId], references: [id])
+  user         User                @relation(fields: [userId], references: [id])
+  interactions ReviewInteraction[]
+  deletionLog  ReviewDeletionLog?
+
+  @@map("reviews")
+}
+
+/// Bảng 4: Lịch sử xóa đánh giá dành riêng cho Admin kiểm soát
+/// @author Thanh Vien A
+model ReviewDeletionLog {
+  id                 String   @id @default(uuid())
+  reviewId           String   @unique @map("review_id")          // Bài đánh giá đã bị xóa
+  branchId           String   @map("branch_id")                  // Bị xóa ở chi nhánh nào
+  deletedByManagerId String   @map("deleted_by_manager_id")      // Ai (Quản lý nào) đã bấm nút xóa
+  reviewSnapshot     Json     @map("review_snapshot")            // Bản chụp toàn bộ nội dung gốc (JSON IReviewSnapshot)
+  deletedAt          DateTime @default(now()) @map("deleted_at") // Thời điểm bấm xóa
+
+  // Liên kết khóa ngoại
+  review           Review @relation(fields: [reviewId], references: [id])
+  branch           Branch @relation(fields: [branchId], references: [id])
+  deletedByManager User   @relation("ManagerDeletedLogs", fields: [deletedByManagerId], references: [id])
+
+  @@map("review_deletion_logs")
+}
+
+/// Bảng 5: Tương tác Bình luận (Reply) & Thả cảm xúc (Reaction)
+/// @author Thanh Vien A
+model ReviewInteraction {
+  id           String          @id @default(uuid())
+  reviewId     String          @map("review_id")
+  userId       String          @map("user_id")
+  type         InteractionType                   // 'REPLY' hoặc 'REACTION'
+  reactionType String?         @map("reaction_type") // Ví dụ: "LIKE", "LOVE", "YUMMY" (nếu type == REACTION)
+  replyContent String?         @map("reply_content") // Nội dung trả lời (nếu type == REPLY)
+  createdAt    DateTime        @default(now()) @map("created_at")
+
+  // Xóa đánh giá vĩnh viễn (nếu Admin yêu cầu) thì các tương tác con tự động bị xóa theo (Cascade)
+  review Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@map("review_interactions")
+}
