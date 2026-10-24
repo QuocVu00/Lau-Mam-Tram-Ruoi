@@ -4,20 +4,23 @@
  * @file frontend-nextjs/src/app/(customer)/page.tsx
  * @author Thành viên B (Task B1.1 & Task B1.3)
  * @description Trang chủ khách hàng: Hiển thị Banner món lẩu mắm trứ danh,
- * Bộ chọn chi nhánh của B ở trên và nhúng <ReviewFeed /> của A ở dưới.
+ * Nút mở Menu đặt mang về nhanh, Bộ chọn chi nhánh của B ở trên và nhúng <ReviewFeed /> của A ở dưới.
  */
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Flame, Star, Sparkles, MapPin, Award } from 'lucide-react';
+import { Flame, Star, Sparkles, MapPin, Award, ShoppingBag, Utensils } from 'lucide-react';
 import { BranchSelector, Branch } from '@/components/branches/BranchSelector';
 import { ReviewFeed } from '@/components/reviews/ReviewFeed';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useBooking } from '@/context/BookingContext';
 
 function CustomerHomeContent() {
   const searchParams = useSearchParams();
   const selectedBranchId = searchParams.get('branchId');
+  const { openBooking } = useBooking();
 
   // Dữ liệu chi nhánh mẫu ban đầu (sẽ load từ API NestJS /branches)
   const [branches, setBranches] = useState<Branch[]>([
@@ -65,7 +68,7 @@ function CustomerHomeContent() {
     <div className="space-y-6">
       {/* Hero Food Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-600 via-orange-600 to-amber-900 p-5 text-white shadow-xl shadow-orange-950/40 border border-orange-500/30">
-        <div className="relative z-10 space-y-2.5">
+        <div className="relative z-10 space-y-3">
           <div className="flex items-center gap-2">
             <Badge className="bg-neutral-900/80 text-amber-300 border-amber-400/30 backdrop-blur-sm">
               <Award className="h-3 w-3 mr-1 text-amber-400" />
@@ -91,6 +94,26 @@ function CustomerHomeContent() {
               <Star className="h-3.5 w-3.5 fill-amber-300 text-amber-300" />
               <span>{currentBranch?.avgRating.toFixed(1)} Sao</span>
             </div>
+          </div>
+
+          {/* Quick Action Buttons on Banner */}
+          <div className="pt-2 flex items-center gap-2">
+            <button
+              onClick={() => openBooking('TAKEAWAY')}
+              type="button"
+              className="flex-1 py-2.5 px-3 rounded-xl bg-white text-neutral-900 hover:bg-neutral-100 text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-lg shadow-black/30 transition-all active:scale-95 cursor-pointer"
+            >
+              <ShoppingBag className="h-4 w-4 text-orange-600" />
+              <span>Xem Menu & Đặt Mang Về</span>
+            </button>
+            <button
+              onClick={() => openBooking('BOOK_TABLE')}
+              type="button"
+              className="py-2.5 px-3 rounded-xl bg-black/40 hover:bg-black/60 border border-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer"
+            >
+              <Utensils className="h-4 w-4 text-amber-300" />
+              <span>Đặt Bàn Quán</span>
+            </button>
           </div>
         </div>
 

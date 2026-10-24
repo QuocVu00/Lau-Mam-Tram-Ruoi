@@ -6,10 +6,25 @@
  * @description Màn hình Tiếp nhận đơn Đặt bàn / Mua mang về Realtime ("Ting")
  * dành cho Quản lý chi nhánh (Role 2).
  * Tích hợp Socket.io tự phát âm thanh Ting, hiển thị thông báo tức thì và nút mở nhanh Zalo khách.
+ * Hiển thị nổi bật chi tiết danh sách món khách chọn từ 2 Menu mang về.
  */
 
-import React, { useState, useEffect } from 'react';
-import { Bell, Phone, Utensils, CalendarDays, CheckCircle2, Clock, Users, ArrowUpRight, RefreshCw } from 'lucide-react';
+import React, { useState } from 'react';
+import {
+  Bell,
+  Phone,
+  Utensils,
+  CalendarDays,
+  ShoppingBag,
+  CheckCircle2,
+  Clock,
+  Users,
+  ArrowUpRight,
+  RefreshCw,
+  Copy,
+  Check,
+  Sparkles,
+} from 'lucide-react';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { ManagerRealtimeAlert } from '@/components/bookings/ManagerRealtimeAlert';
 import { Button } from '@/components/ui/button';
@@ -32,26 +47,40 @@ export default function ManagerBookingsPage() {
   const currentBranchId = 'b1-default';
   const currentBranchName = 'Lẩu Mắm Trăm Rưỡi - Quận 1';
 
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
   const [bookings, setBookings] = useState<BookingItem[]>([
     {
       id: 'ord-101',
+      customerName: 'Chị Mai Linh',
+      zaloPhone: '0912 345 678',
+      guestCount: 3,
+      type: 'TAKEAWAY',
+      details:
+        '[ĐƠN MANG VỀ ĐÃ CHỌN MÓN]\n• 1x Set Đặc Biệt (2-3 người) (299.000đ)\n• 1x Mẹt Rau Đồng Thêm (12 loại rau) (35.000đ)\n• 2x Trà Tắc Hạt Chia (40.000đ)\n=> TỔNG TẠM TÍNH: 374.000đ\n* Ghi chú khách: Lấy lúc 18h30, không ăn cay, cho thêm ớt để riêng',
+      status: 'NEW',
+      createdAt: '5 phút trước',
+    },
+    {
+      id: 'ord-102',
       customerName: 'Anh Quốc Tuấn',
       zaloPhone: '0988 123 456',
       guestCount: 4,
       type: 'BOOK_TABLE',
-      details: 'Cần bàn gần cửa sổ, ăn cay vừa',
-      status: 'NEW',
-      createdAt: '10 phút trước',
+      details: 'Cần bàn gần cửa sổ, ăn cay vừa, chuẩn bị 4 bộ chén dĩa',
+      status: 'CONFIRMED',
+      createdAt: '25 phút trước',
     },
     {
-      id: 'ord-102',
-      customerName: 'Chị Mai Linh',
-      zaloPhone: '0912 345 678',
+      id: 'ord-103',
+      customerName: 'Anh Hoàng Nam',
+      zaloPhone: '0933 555 777',
       guestCount: 2,
       type: 'TAKEAWAY',
-      details: 'Lấy lúc 18h30, thêm rau đắng',
-      status: 'CONFIRMED',
-      createdAt: '30 phút trước',
+      details:
+        '[ĐƠN MANG VỀ ĐÃ CHỌN MÓN]\n• 1x Set Lẩu 1 Người (150.000đ)\n• 1x Đĩa Ba Rọi Heo (200g) (45.000đ)\n• 1x Nước Sâm Mía Lau Rong Biển (18.000đ)\n=> TỔNG TẠM TÍNH: 213.000đ\n* Ghi chú khách: Nước lẩu nóng hổi, lấy đũa muỗng dùng 1 lần',
+      status: 'DONE',
+      createdAt: '1 giờ trước',
     },
   ]);
 
@@ -66,6 +95,7 @@ export default function ManagerBookingsPage() {
         zaloPhone: newAlert.zaloPhone,
         guestCount: newAlert.guestCount,
         type: newAlert.type,
+        details: newAlert.details,
         status: 'NEW',
         createdAt: 'Vừa xong',
       },
@@ -77,6 +107,12 @@ export default function ManagerBookingsPage() {
     setBookings((prev) =>
       prev.map((item) => (item.id === id ? { ...item, status: newStatus } : item)),
     );
+  };
+
+  const handleCopyDetails = (id: string, text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   const filteredBookings = bookings.filter((b) => {
@@ -131,14 +167,15 @@ export default function ManagerBookingsPage() {
             >
               {tab === 'ALL' && `Tất cả (${bookings.length})`}
               {tab === 'NEW' && `Đơn mới (${bookings.filter((b) => b.status === 'NEW').length})`}
-              {tab === 'CONFIRMED' && `Đã xác nhận (${bookings.filter((b) => b.status === 'CONFIRMED').length})`}
+              {tab === 'CONFIRMED' &&
+                `Đã xác nhận (${bookings.filter((b) => b.status === 'CONFIRMED').length})`}
               {tab === 'DONE' && `Hoàn tất (${bookings.filter((b) => b.status === 'DONE').length})`}
             </button>
           ))}
         </div>
 
         {/* Bookings List */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           {filteredBookings.length === 0 ? (
             <Card className="p-8 text-center text-xs text-neutral-400">
               Không có đơn nào trong mục này
@@ -146,35 +183,37 @@ export default function ManagerBookingsPage() {
           ) : (
             filteredBookings.map((order) => {
               const isNew = order.status === 'NEW';
+              const isTakeaway = order.type === 'TAKEAWAY';
+
               return (
                 <Card
                   key={order.id}
                   className={cn(
                     'p-5 transition-all space-y-4 border',
                     isNew
-                      ? 'border-amber-500/70 bg-neutral-900/90 shadow-lg shadow-amber-950/30'
-                      : 'border-neutral-800 bg-neutral-900/50',
+                      ? 'border-amber-500/80 bg-neutral-900/90 shadow-xl shadow-amber-950/40 ring-1 ring-amber-500/40'
+                      : 'border-neutral-800 bg-neutral-900/60',
                   )}
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div className="flex items-start gap-3.5">
                       <div
                         className={cn(
-                          'flex h-11 w-11 items-center justify-center rounded-2xl shrink-0',
-                          order.type === 'BOOK_TABLE'
-                            ? 'bg-amber-500/10 text-amber-500 border border-amber-500/30'
-                            : 'bg-sky-500/10 text-sky-400 border border-sky-500/30',
+                          'flex h-12 w-12 items-center justify-center rounded-2xl shrink-0 mt-0.5',
+                          isTakeaway
+                            ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                            : 'bg-sky-500/15 text-sky-400 border border-sky-500/30',
                         )}
                       >
-                        {order.type === 'BOOK_TABLE' ? (
-                          <Utensils className="h-5 w-5" />
+                        {isTakeaway ? (
+                          <ShoppingBag className="h-6 w-6" />
                         ) : (
-                          <CalendarDays className="h-5 w-5" />
+                          <CalendarDays className="h-6 w-6" />
                         )}
                       </div>
 
-                      <div>
-                        <div className="flex items-center gap-2">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="font-extrabold text-base text-white">
                             {order.customerName}
                           </h3>
@@ -191,28 +230,36 @@ export default function ManagerBookingsPage() {
                             {order.status === 'CONFIRMED' && 'ĐÃ XÁC NHẬN'}
                             {order.status === 'DONE' && 'HOÀN TẤT'}
                           </Badge>
+                          <Badge
+                            variant={isTakeaway ? 'warning' : 'default'}
+                            className="text-[10px]"
+                          >
+                            {isTakeaway ? 'Mang về (Chọn món từ Menu)' : 'Đặt bàn ăn tại quán'}
+                          </Badge>
                         </div>
 
-                        <div className="flex items-center gap-4 text-xs text-neutral-400 mt-1">
+                        <div className="flex items-center gap-4 text-xs text-neutral-400">
                           <span className="flex items-center gap-1">
                             <Clock className="h-3.5 w-3.5 text-neutral-500" />
                             {order.createdAt}
                           </span>
-                          {order.type === 'BOOK_TABLE' && (
+                          {!isTakeaway ? (
                             <span className="flex items-center gap-1 text-neutral-300 font-medium">
                               <Users className="h-3.5 w-3.5 text-amber-500" />
                               {order.guestCount} khách
                             </span>
+                          ) : (
+                            <span className="flex items-center gap-1 text-amber-400 font-medium">
+                              <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                              Đơn món mang về
+                            </span>
                           )}
-                          <span className="text-amber-400 font-medium">
-                            {order.type === 'BOOK_TABLE' ? 'Ăn tại quán' : 'Mua mang về'}
-                          </span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Actions: Open Zalo & Change Status */}
-                    <div className="flex items-center gap-2">
+                    {/* Actions: Mở Zalo & Cập nhật trạng thái */}
+                    <div className="flex items-center gap-2 self-start sm:self-auto">
                       <a
                         href={`https://zalo.me/${order.zaloPhone.replace(/\s+/g, '')}`}
                         target="_blank"
@@ -246,10 +293,36 @@ export default function ManagerBookingsPage() {
                     </div>
                   </div>
 
+                  {/* Chi tiết đơn hàng / Danh sách món khách chọn */}
                   {order.details && (
-                    <div className="p-3 rounded-xl bg-neutral-950 border border-neutral-800 text-xs text-neutral-300">
-                      <span className="text-neutral-500 font-semibold mr-1">Ghi chú:</span>
-                      {order.details}
+                    <div className="p-3.5 rounded-2xl bg-neutral-950 border border-neutral-800 text-xs text-neutral-300 space-y-2">
+                      <div className="flex items-center justify-between text-neutral-400 font-semibold border-b border-neutral-800/80 pb-1.5">
+                        <span className="flex items-center gap-1.5 text-amber-400 font-bold">
+                          <Utensils className="h-3.5 w-3.5" />
+                          <span>Chi tiết món / Ghi chú của khách:</span>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyDetails(order.id, order.details || '')}
+                          className="flex items-center gap-1 text-[11px] text-neutral-400 hover:text-white transition-colors cursor-pointer"
+                        >
+                          {copiedId === order.id ? (
+                            <>
+                              <Check className="h-3 w-3 text-emerald-400" />
+                              <span className="text-emerald-400">Đã chép</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-3 w-3" />
+                              <span>Sao chép đơn</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      <pre className="text-neutral-200 text-xs font-sans whitespace-pre-wrap leading-relaxed">
+                        {order.details}
+                      </pre>
                     </div>
                   )}
                 </Card>

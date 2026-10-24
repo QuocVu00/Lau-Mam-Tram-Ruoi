@@ -5,20 +5,22 @@
  * @description Component tiếp nhận thông báo Đặt bàn / Mua mang về Realtime ("Ting")
  * dành riêng cho Quản lý chi nhánh (Role 2).
  * Lắng nghe sự kiện `new_booking_alert` qua Socket.io và tự động phát âm thanh chuông "Ting".
+ * Hiển thị đầy đủ danh sách món ăn nếu là đơn Mang về.
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { BellRing, Check, Phone, X, Utensils, CalendarDays } from 'lucide-react';
+import { BellRing, Check, Phone, X, ShoppingBag, CalendarDays, Utensils } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-interface BookingAlertPayload {
+export interface BookingAlertPayload {
   bookingId: string;
   customerName: string;
   zaloPhone: string;
   guestCount: number;
   type: 'BOOK_TABLE' | 'TAKEAWAY';
+  details?: string;
   createdAt: string;
 }
 
@@ -83,7 +85,6 @@ export function ManagerRealtimeAlert({
 
     socket.on('connect', () => {
       setIsConnected(true);
-      // Tham gia vào đúng phòng của chi nhánh mình quản lý
       socket.emit('join_branch_room', { branchId });
     });
 
@@ -121,22 +122,27 @@ export function ManagerRealtimeAlert({
 
       {/* Floating Alert Popup ("Ting" Notification Banner) */}
       {activeAlert && (
-        <div className="fixed top-5 right-5 z-50 w-full max-w-sm rounded-2xl border border-amber-500/50 bg-neutral-900/95 p-4 shadow-2xl backdrop-blur-md animate-in slide-in-from-top-4 duration-300">
+        <div className="fixed top-5 right-5 z-50 w-full max-w-md rounded-2xl border border-amber-500/60 bg-neutral-900/98 p-4 shadow-2xl backdrop-blur-md animate-in slide-in-from-top-4 duration-300">
           <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg shadow-orange-950/50 animate-bounce">
+            <div className="flex items-start gap-2.5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg shadow-orange-950/50 animate-bounce shrink-0 mt-0.5">
                 <BellRing className="h-5 w-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <h4 className="font-extrabold text-sm text-white">🔔 ĐƠN MỚI "TING"!</h4>
-                  <Badge variant="warning" className="text-[10px]">
-                    {activeAlert.type === 'BOOK_TABLE' ? 'Ăn Tại Quán' : 'Mang Về'}
+                  <Badge
+                    variant={activeAlert.type === 'TAKEAWAY' ? 'warning' : 'info'}
+                    className="text-[10px]"
+                  >
+                    {activeAlert.type === 'TAKEAWAY' ? 'MANG VỀ CHỌN MÓN' : 'ĂN TẠI QUÁN'}
                   </Badge>
                 </div>
                 <p className="text-xs text-neutral-300 mt-0.5">
                   Khách: <span className="font-bold text-white">{activeAlert.customerName}</span>
-                  {activeAlert.type === 'BOOK_TABLE' && ` (${activeAlert.guestCount} người)`}
+                  {activeAlert.type === 'BOOK_TABLE'
+                    ? ` (${activeAlert.guestCount} người)`
+                    : ` (${activeAlert.guestCount} phần món)`}
                 </p>
               </div>
             </div>
@@ -148,6 +154,13 @@ export function ManagerRealtimeAlert({
             </button>
           </div>
 
+          {/* Chi tiết món nếu có */}
+          {activeAlert.details && (
+            <div className="mt-2.5 p-2.5 rounded-xl bg-neutral-950 border border-neutral-800 text-[11px] text-neutral-300 max-h-32 overflow-y-auto leading-relaxed whitespace-pre-wrap">
+              {activeAlert.details}
+            </div>
+          )}
+
           <div className="mt-3 pt-3 border-t border-neutral-800 flex items-center justify-between gap-2">
             <div className="text-xs text-neutral-400 flex items-center gap-1">
               <Phone className="h-3 w-3 text-amber-500" />
@@ -155,7 +168,7 @@ export function ManagerRealtimeAlert({
             </div>
             <div className="flex items-center gap-2">
               <a
-                href={`https://zalo.me/${activeAlert.zaloPhone}`}
+                href={`https://zalo.me/${activeAlert.zaloPhone.replace(/\s+/g, '')}`}
                 target="_blank"
                 rel="noreferrer"
                 className="py-1.5 px-3 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold flex items-center gap-1 shadow-sm"

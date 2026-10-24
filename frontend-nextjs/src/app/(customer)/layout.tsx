@@ -7,18 +7,15 @@
  * Dựng khung Header, BottomNav và tích hợp Booking Drawer cùng GoogleOneTapPopup của A.
  */
 
-import React, { useState, Suspense } from 'react';
+import React, { Suspense } from 'react';
 import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { BookingDrawerZalo } from '@/components/bookings/BookingDrawerZalo';
 import { GoogleOneTapPopup } from '@/components/auth/GoogleOneTapPopup';
+import { BookingProvider, useBooking } from '@/context/BookingContext';
 
-export default function CustomerLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [isBookingOpen, setIsBookingOpen] = useState(false);
+function CustomerLayoutInner({ children }: { children: React.ReactNode }) {
+  const { isOpen, closeBooking, bookingType, openBooking } = useBooking();
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col justify-between">
@@ -30,19 +27,32 @@ export default function CustomerLayout({
 
         <main className="flex-1 px-4 py-4">{children}</main>
 
-        <BottomNav onOpenBookingDrawer={() => setIsBookingOpen(true)} />
+        <BottomNav onOpenBookingDrawer={() => openBooking('TAKEAWAY')} />
 
         {/* Modal / Drawer Đặt bàn qua Zalo */}
         <BookingDrawerZalo
-          isOpen={isBookingOpen}
-          onClose={() => setIsBookingOpen(false)}
+          isOpen={isOpen}
+          onClose={closeBooking}
           branchId="b1-default"
           branchName="Lẩu Mắm Trăm Rưỡi - Quận 1"
+          initialType={bookingType}
         />
 
         {/* Popup Google One Tap của Thành viên A */}
         <GoogleOneTapPopup />
       </div>
     </div>
+  );
+}
+
+export default function CustomerLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <BookingProvider>
+      <CustomerLayoutInner>{children}</CustomerLayoutInner>
+    </BookingProvider>
   );
 }
