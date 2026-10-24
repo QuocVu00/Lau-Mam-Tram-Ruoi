@@ -44,6 +44,11 @@ export interface IReview {
     fullName: string;
     avatarUrl?: string | null;
   };
+  branch?: {
+    id: string;
+    name: string;
+    address: string;
+  };
   interactions?: Array<{
     id: string;
     type: 'REPLY' | 'REACTION';

@@ -388,12 +388,12 @@ export function BookingDrawerZalo({
                   <div className="grid grid-cols-2 gap-2.5">
                     {/* Ảnh Menu 1: Set Lẩu & Hải Sản */}
                     <div
-                      onClick={() => setPreviewImage('/images/menu-lau-mam-1.jpg')}
+                      onClick={() => setPreviewImage('/images/menu1.jpg')}
                       className="group relative rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-950 cursor-pointer hover:border-amber-500/80 transition-all shadow-md"
                     >
                       <div className="relative aspect-[3/4] w-full">
                         <Image
-                          src="/images/menu-lau-mam-1.jpg"
+                          src="/images/menu1.jpg"
                           alt="Menu Set Lẩu Mắm Trăm Rưỡi"
                           fill
                           sizes="(max-width: 768px) 50vw, 300px"
@@ -411,12 +411,12 @@ export function BookingDrawerZalo({
 
                     {/* Ảnh Menu 2: Rau Rừng & Đồ Uống */}
                     <div
-                      onClick={() => setPreviewImage('/images/menu-lau-mam-2.jpg')}
+                      onClick={() => setPreviewImage('/images/menu2.jpg')}
                       className="group relative rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-950 cursor-pointer hover:border-amber-500/80 transition-all shadow-md"
                     >
                       <div className="relative aspect-[3/4] w-full">
                         <Image
-                          src="/images/menu-lau-mam-2.jpg"
+                          src="/images/menu2.jpg"
                           alt="Menu Rau Đồng & Nước Giải Khát"
                           fill
                           sizes="(max-width: 768px) 50vw, 300px"

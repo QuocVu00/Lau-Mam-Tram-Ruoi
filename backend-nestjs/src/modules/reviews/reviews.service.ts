@@ -93,6 +93,13 @@ export class ReviewsService {
             createdAt: 'desc',
           },
           include: {
+            branch: {
+              select: {
+                id: true,
+                name: true,
+                address: true,
+              },
+            },
             user: {
               select: {
                 id: true,
