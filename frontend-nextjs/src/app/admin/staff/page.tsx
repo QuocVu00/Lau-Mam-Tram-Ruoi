@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { apiClient } from '@/lib/api';
 
 interface StaffUser {
   id: string;
@@ -53,40 +54,49 @@ export default function AdminStaffPage() {
     },
   ]);
 
-  const [branches, setBranches] = useState<BranchItem[]>([
-    { id: 'b1-default', name: 'Lẩu Mắm Trăm Rưỡi - Quận 1' },
-    { id: 'b2-default', name: 'Lẩu Mắm Trăm Rưỡi - Bình Thạnh' },
-  ]);
-
+  const [branches, setBranches] = useState<BranchItem[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [selectedBranchId, setSelectedBranchId] = useState('b1-default');
+  const [selectedBranchId, setSelectedBranchId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const fetchBranches = async () => {
+    try {
+      const data = await apiClient<BranchItem[]>('/branches');
+      if (Array.isArray(data) && data.length > 0) {
+        setBranches(data);
+        setSelectedBranchId(data[0].id);
+      }
+    } catch (e) {
+      console.warn('Lỗi lấy danh sách chi nhánh:', e);
+    }
+  };
 
   const fetchStaff = async () => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      const res = await fetch(`${apiUrl}/users/managers`);
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data)) setStaffList(data);
+      const data = await apiClient<StaffUser[]>('/users/managers');
+      if (Array.isArray(data)) {
+        setStaffList(data);
       }
-    } catch (e) {
-      // Mock data fallback
+    } catch (e: any) {
+      console.warn('Lỗi lấy danh sách quản lý:', e);
     }
   };
+
+  useEffect(() => {
+    fetchBranches();
+    fetchStaff();
+  }, []);
 
   const handleCreateManager = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      const res = await fetch(`${apiUrl}/users/managers`, {
+      const newManager = await apiClient<StaffUser>('/users/managers', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           fullName,
           email,
@@ -95,32 +105,14 @@ export default function AdminStaffPage() {
         }),
       });
 
-      if (res.ok) {
-        const newManager = await res.json();
-        setStaffList((prev) => [...prev, newManager]);
-      } else {
-        // Optimistic addition for demo
-        const targetBranch = branches.find((b) => b.id === selectedBranchId);
-        setStaffList((prev) => [
-          ...prev,
-          {
-            id: `usr-${Date.now()}`,
-            fullName,
-            email,
-            role: 'MANAGER',
-            branchId: selectedBranchId,
-            branch: { name: targetBranch?.name || 'Chi nhánh mới' },
-            createdAt: new Date().toISOString().split('T')[0],
-          },
-        ]);
-      }
-
+      setStaffList((prev) => [newManager, ...prev]);
+      alert(`Đã cấp thành công tài khoản Quản lý cho: ${email}`);
       setFullName('');
       setEmail('');
       setPassword('');
       setIsModalOpen(false);
-    } catch (e) {
-      console.error(e);
+    } catch (err: any) {
+      alert(err.message || 'Lỗi khi tạo tài khoản quản lý! Hãy chắc chắn bạn đã đăng nhập tài khoản Admin.');
     } finally {
       setIsLoading(false);
     }
@@ -129,10 +121,12 @@ export default function AdminStaffPage() {
   const handleDeleteStaff = async (id: string) => {
     if (!confirm('Bạn có chắc chắn muốn xóa tài khoản Quản lý này?')) return;
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      await fetch(`${apiUrl}/users/managers/${id}`, { method: 'DELETE' });
-    } catch (e) {}
-    setStaffList((prev) => prev.filter((item) => item.id !== id));
+      await apiClient(`/users/managers/${id}`, { method: 'DELETE' });
+      setStaffList((prev) => prev.filter((item) => item.id !== id));
+      alert('Đã xóa tài khoản Quản lý khỏi hệ thống.');
+    } catch (e: any) {
+      alert(e.message || 'Lỗi khi xóa tài khoản!');
+    }
   };
 
   return (
