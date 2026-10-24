@@ -12,7 +12,7 @@
  */
 
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { IJwtPayload } from '../../../../shared/contracts';
+import type { IJwtPayload } from '../../contracts';
 
 export const CurrentUser = createParamDecorator(
   /**

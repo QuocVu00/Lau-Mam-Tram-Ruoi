@@ -12,7 +12,7 @@ import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingStatusDto } from './dto/update-booking-status.dto';
 import { Role } from '@prisma/client';
 import { Roles, RolesGuard, JwtAuthGuard, CurrentUser } from '../../common';
-import { IJwtPayload } from '../../../../shared/contracts';
+import type { IJwtPayload } from '../../contracts';
 
 /**
  * @author Thành viên B (Task B3.1)

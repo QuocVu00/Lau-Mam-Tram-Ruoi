@@ -4,7 +4,9 @@
  * @file frontend-nextjs/src/app/(customer)/layout.tsx
  * @author Thành viên B (Task B1.1)
  * @description Layout chuẩn Mobile-First cho Khách hàng:
- * Dựng khung Header, BottomNav và tích hợp Booking Drawer cùng GoogleOneTapPopup của A.
+ * Tích hợp Khung mô phỏng điện thoại thông minh (MobileFrame) trên Desktop,
+ * hiển thị toàn màn hình Native App trên điện thoại thật,
+ * kèm Header, BottomNav, Booking Drawer và GoogleOneTapPopup.
  */
 
 import React, { Suspense } from 'react';
@@ -12,20 +14,20 @@ import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { BookingDrawerZalo } from '@/components/bookings/BookingDrawerZalo';
 import { GoogleOneTapPopup } from '@/components/auth/GoogleOneTapPopup';
+import { MobileFrame } from '@/components/layout/MobileFrame';
 import { BookingProvider, useBooking } from '@/context/BookingContext';
 
 function CustomerLayoutInner({ children }: { children: React.ReactNode }) {
   const { isOpen, closeBooking, bookingType, openBooking } = useBooking();
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col justify-between">
-      {/* Khung giới hạn chiều rộng chuẩn Mobile-First (tối đa max-w-lg căn giữa) */}
-      <div className="mx-auto w-full max-w-lg min-h-screen flex flex-col pb-24 shadow-2xl bg-neutral-900/60 border-x border-neutral-800/80">
+    <MobileFrame>
+      <div className="w-full flex-1 flex flex-col justify-between relative min-h-full">
         <Suspense fallback={<div className="h-14 border-b border-neutral-800 bg-neutral-950/80" />}>
           <Header />
         </Suspense>
 
-        <main className="flex-1 px-4 py-4">{children}</main>
+        <main className="flex-1 px-4 py-3">{children}</main>
 
         <BottomNav onOpenBookingDrawer={() => openBooking('TAKEAWAY')} />
 
@@ -41,7 +43,7 @@ function CustomerLayoutInner({ children }: { children: React.ReactNode }) {
         {/* Popup Google One Tap của Thành viên A */}
         <GoogleOneTapPopup />
       </div>
-    </div>
+    </MobileFrame>
   );
 }
 

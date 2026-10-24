@@ -23,8 +23,8 @@ export function BottomNav({ onOpenBookingDrawer }: BottomNavProps) {
   const isBranches = pathname === '/branches';
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-neutral-800 bg-neutral-950/90 backdrop-blur-lg">
-      <div className="mx-auto flex max-w-lg items-center justify-around px-2 py-2">
+    <nav className="sticky bottom-0 left-0 right-0 z-40 border-t border-neutral-800 bg-neutral-950/95 backdrop-blur-lg shrink-0 mt-auto">
+      <div className="mx-auto flex w-full max-w-lg items-center justify-around px-2 py-2">
         {/* Tab 1: Đánh giá */}
         <Link
           href="/"

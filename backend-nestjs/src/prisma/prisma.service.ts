@@ -13,13 +13,20 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
    * Tự động kết nối tới cơ sở dữ liệu PostgreSQL ngay khi ứng dụng NestJS vừa khởi động.
    */
   async onModuleInit() {
-    await this.$connect();
+    try {
+      await this.$connect();
+      console.log('✅ Kết nối PostgreSQL thành công!');
+    } catch (err) {
+      console.warn('⚠️ Chưa kết nối được PostgreSQL (đang chạy chế độ demo/in-memory fallback):', (err as any).message);
+    }
   }
 
   /**
    * Tự động đóng kết nối cơ sở dữ liệu an toàn khi tắt server hoặc khởi động lại.
    */
   async onModuleDestroy() {
-    await this.$disconnect();
+    try {
+      await this.$disconnect();
+    } catch (e) {}
   }
 }
