@@ -9,9 +9,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Store, Plus, Star, MapPin, Phone, MessageSquare, RefreshCw } from 'lucide-react';
+import { Store, Plus, Star, MapPin, Phone, MessageSquare, RefreshCw, ChevronRight, Eye, ClipboardCheck } from 'lucide-react';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { AdminBranchModal } from '@/components/branches/AdminBranchModal';
+import { BranchWorkInspectorModal } from '@/components/branches/BranchWorkInspectorModal';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -47,6 +48,7 @@ export default function AdminBranchesPage() {
     },
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [inspectedBranch, setInspectedBranch] = useState<BranchItem | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchBranches = async () => {
@@ -133,16 +135,26 @@ export default function AdminBranchesPage() {
 
         {/* Branches Table / Cards */}
         <div className="space-y-4">
-          <h2 className="text-sm font-bold text-neutral-300 uppercase tracking-wider">
-            Danh Sách Chi Nhánh
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
+              <ClipboardCheck className="w-4 h-4 text-amber-500" />
+              <span>Danh Sách Chi Nhánh (Nhấp vào chi nhánh để kiểm tra công việc)</span>
+            </h2>
+            <span className="text-xs text-amber-400 font-medium">Bấm vào thẻ để xem đơn & đánh giá</span>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {branches.map((b) => (
-              <Card key={b.id} className="p-5 space-y-4 hover:border-neutral-700 transition-all">
+              <Card
+                key={b.id}
+                onClick={() => setInspectedBranch(b)}
+                className="p-5 space-y-4 hover:border-amber-500/60 hover:bg-neutral-900/95 transition-all duration-200 cursor-pointer group shadow-md hover:shadow-xl hover:shadow-amber-500/10 active:scale-[0.99] border-neutral-800 relative overflow-hidden"
+              >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="font-extrabold text-base text-white">{b.name}</h3>
+                    <h3 className="font-extrabold text-base text-white group-hover:text-amber-400 transition-colors flex items-center gap-1.5">
+                      <span>{b.name}</span>
+                    </h3>
                     <p className="text-xs text-neutral-400 flex items-center gap-1.5 mt-1">
                       <MapPin className="h-3.5 w-3.5 text-neutral-500 shrink-0" />
                       <span>{b.address}</span>
@@ -153,7 +165,7 @@ export default function AdminBranchesPage() {
                     </p>
                   </div>
 
-                  <div className="flex flex-col items-end">
+                  <div className="flex flex-col items-end shrink-0">
                     <div className="flex items-center gap-1 bg-amber-500/10 border border-amber-500/30 rounded-xl px-2.5 py-1">
                       <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
                       <span className="text-sm font-black text-amber-400">
@@ -167,8 +179,12 @@ export default function AdminBranchesPage() {
                 </div>
 
                 <div className="pt-3 border-t border-neutral-800 flex items-center justify-between text-xs text-neutral-400">
-                  <span className="text-[11px]">Mã ID: {b.id.slice(0, 10)}...</span>
-                  <Badge variant="success" className="text-[10px]">Đang hoạt động</Badge>
+                  <span className="text-[11px] text-neutral-500">Mã ID: {b.id.slice(0, 8)}...</span>
+                  <div className="flex items-center gap-1.5 text-amber-400 font-bold group-hover:translate-x-1 transition-transform">
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Kiểm tra công việc</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </div>
                 </div>
               </Card>
             ))}
@@ -181,6 +197,13 @@ export default function AdminBranchesPage() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={fetchBranches}
+      />
+
+      {/* Modal Thanh Tra & Kiểm Tra Công Việc Chi Nhánh */}
+      <BranchWorkInspectorModal
+        branch={inspectedBranch}
+        isOpen={!!inspectedBranch}
+        onClose={() => setInspectedBranch(null)}
       />
     </div>
   );
