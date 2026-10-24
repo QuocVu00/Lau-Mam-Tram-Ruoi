@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  # Dịch vụ Cơ sở dữ liệu PostgreSQL
+  postgres:
+    image: postgres:16-alpine # Sử dụng bản PostgreSQL 16 siêu nhẹ (Alpine)
+    container_name: lau_mam_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: lau_mam_tram_ruoi
+    ports:
+      - "5432:5432" # Mở cổng 5432 trên máy tính của bạn
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Lưu dữ liệu vào ổ đĩa để không bị mất khi tắt Docker
+
+volumes:
+  postgres_data:

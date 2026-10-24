@@ -10,9 +10,9 @@ import { PrismaModule } from './prisma/prisma.module';
 
 // ============================================================================
 // [KHU VỰC DÀNH CHO THÀNH VIÊN A IMPORT MODULES]
-// Ví dụ khi bạn viết xong AuthModule, ReviewModule:
-// import { AuthModule } from './modules/auth/auth.module';
-// import { ReviewsModule } from './modules/reviews/reviews.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
+import { DeletionLogsModule } from './modules/deletion-logs/deletion-logs.module';
 // ============================================================================
 
 // ============================================================================
@@ -35,9 +35,9 @@ import { BookingsModule } from './modules/bookings/bookings.module';
 
     // ------------------------------------------------------------------------
     // 🔴 [MODULES CỦA THÀNH VIÊN A] - Bạn thêm các module của bạn tại đây:
-    // AuthModule,
-    // ReviewsModule,
-    // DeletionLogsModule,
+    AuthModule,
+    ReviewsModule,
+    DeletionLogsModule,
     // MediaModule,
     // ------------------------------------------------------------------------
 
