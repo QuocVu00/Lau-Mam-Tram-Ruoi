@@ -183,16 +183,25 @@ export function ReviewFeed({ branchId = '' }: ReviewFeedProps) {
                 {review.content}
               </p>
 
-              {/* Hình ảnh đính kèm (nếu có) */}
+              {/* Phương tiện đính kèm: Hỗ trợ cả Hình ảnh lẫn Video */}
               {review.mediaUrls && review.mediaUrls.length > 0 && (
                 <div className="grid grid-cols-3 gap-2 mt-3">
                   {review.mediaUrls.map((media, idx) => (
-                    <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-neutral-800 group">
-                      <img
-                        src={media.url}
-                        alt="Món ăn"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
+                    <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-stone-800 bg-black group">
+                      {media.type === 'VIDEO' ? (
+                        <video
+                          src={media.url}
+                          controls
+                          playsInline
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <img
+                          src={media.url}
+                          alt="Món ăn"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      )}
                     </div>
                   ))}
                 </div>

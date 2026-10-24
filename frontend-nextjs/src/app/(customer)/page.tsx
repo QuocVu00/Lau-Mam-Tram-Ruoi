@@ -2,47 +2,51 @@
 
 /**
  * @file frontend-nextjs/src/app/(customer)/page.tsx
- * @author Thành viên B (Task B1.1 & Task B1.3)
- * @description Trang chủ khách hàng: Hiển thị Banner món lẩu mắm trứ danh,
- * Nút mở Menu đặt mang về nhanh, Bộ chọn chi nhánh của B ở trên và nhúng <ReviewFeed /> của A ở dưới.
+ * @description Trang chủ dành cho Khách vãng lai:
+ * Tinh gọn chỉ tập trung đúng 3 nội dung trọng tâm:
+ * 1. Đặt bàn ăn tại quán (BOOK_TABLE)
+ * 2. Đặt món mang về (TAKEAWAY)
+ * 3. Dòng thời gian bài đánh giá từ thực khách (ReviewFeed)
  */
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Flame, Star, Sparkles, MapPin, Award, ShoppingBag, Utensils } from 'lucide-react';
-import { BranchSelector, Branch } from '@/components/branches/BranchSelector';
+import { Utensils, ShoppingBag, Star, Flame, Sparkles, MapPin, CalendarDays } from 'lucide-react';
 import { ReviewFeed } from '@/components/reviews/ReviewFeed';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { useBooking } from '@/context/BookingContext';
+
+interface BranchItem {
+  id: string;
+  name: string;
+  address: string;
+  phone: string;
+  avgRating: number;
+}
 
 function CustomerHomeContent() {
   const searchParams = useSearchParams();
   const selectedBranchId = searchParams.get('branchId');
   const { openBooking } = useBooking();
 
-  // Dữ liệu chi nhánh mẫu ban đầu (sẽ load từ API NestJS /branches)
-  const [branches, setBranches] = useState<Branch[]>([
+  // Danh sách chi nhánh của quán
+  const [branches, setBranches] = useState<BranchItem[]>([
     {
       id: 'b1-default',
-      name: 'Lẩu Mắm Trăm Rưỡi - Quận 1',
+      name: 'Chi nhánh Quận 1',
       address: '150 Nguyễn Trãi, P. Bến Thành, Quận 1, TP.HCM',
       phone: '0909 150 150',
       avgRating: 4.9,
-      totalActiveReviews: 128,
     },
     {
       id: 'b2-default',
-      name: 'Lẩu Mắm Trăm Rưỡi - Bình Thạnh',
+      name: 'Chi nhánh Bình Thạnh',
       address: '280 Phan Xích Long nối dài, P. 2, Q. Phú Nhuận',
       phone: '0909 150 151',
       avgRating: 4.8,
-      totalActiveReviews: 96,
     },
   ]);
 
-  // Thử gọi API backend nếu server đang chạy
+  // Tải chi nhánh từ Backend nếu có
   useEffect(() => {
     async function fetchBranches() {
       try {
@@ -55,7 +59,7 @@ function CustomerHomeContent() {
           }
         }
       } catch (e) {
-        // Fallback to sample data
+        // Sử dụng dữ liệu mẫu nếu backend đang bận
       }
     }
     fetchBranches();
@@ -65,74 +69,86 @@ function CustomerHomeContent() {
     branches.find((b) => b.id === selectedBranchId) || branches[0];
 
   return (
-    <div className="space-y-6">
-      {/* Hero Food Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-600 via-orange-600 to-amber-900 p-5 text-white shadow-xl shadow-orange-950/40 border border-orange-500/30">
-        <div className="relative z-10 space-y-3">
-          <div className="flex items-center gap-2">
-            <Badge className="bg-neutral-900/80 text-amber-300 border-amber-400/30 backdrop-blur-sm">
-              <Award className="h-3 w-3 mr-1 text-amber-400" />
-              Đặc sản miền Tây
-            </Badge>
-            <span className="text-[11px] text-amber-100/90 font-medium">Chỉ 150.000đ/người</span>
-          </div>
-
-          <h2 className="text-xl font-extrabold tracking-tight leading-tight">
-            Nồi Lẩu Mắm Trăm Rưỡi Đậm Đà Ngon Khó Cưỡng!
-          </h2>
-
-          <p className="text-xs text-amber-100/80 leading-relaxed">
-            Hương thơm quyến rũ từ mắm cá linh, cá sặc đồng quê, kèm khay hải sản tươi rói và 12 loại rau đồng xanh mướt.
-          </p>
-
-          <div className="flex items-center gap-3 pt-1 text-xs font-semibold">
-            <div className="flex items-center gap-1 bg-black/30 backdrop-blur-md px-2.5 py-1 rounded-xl">
-              <Flame className="h-3.5 w-3.5 text-amber-300" />
-              <span>Nước lẩu bí truyền</span>
+    <div className="space-y-4">
+      {/* ------------------------------------------------------------- */}
+      {/* KHỐI 1 & 2: HAI NÚT HÀNH ĐỘNG CỐT LÕI - ĐẶT BÀN & MANG VỀ      */}
+      {/* ------------------------------------------------------------- */}
+      <div className="grid grid-cols-2 gap-2.5 pt-1">
+        {/* Nút 1: Đặt bàn ăn tại quán */}
+        <button
+          type="button"
+          onClick={() => openBooking('BOOK_TABLE')}
+          className="p-3.5 rounded-2xl bg-gradient-to-br from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white shadow-lg shadow-amber-950/40 border border-amber-500/30 flex flex-col justify-between text-left transition-all active:scale-[0.98] cursor-pointer group"
+        >
+          <div className="flex items-center justify-between w-full mb-3">
+            <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
+              <Utensils className="w-5 h-5 text-white" />
             </div>
-            <div className="flex items-center gap-1 bg-black/30 backdrop-blur-md px-2.5 py-1 rounded-xl">
-              <Star className="h-3.5 w-3.5 fill-amber-300 text-amber-300" />
-              <span>{currentBranch?.avgRating.toFixed(1)} Sao</span>
+            <span className="text-[10px] font-bold bg-black/30 px-2 py-0.5 rounded-full text-amber-200">
+              Tại Quán
+            </span>
+          </div>
+          <div>
+            <h3 className="text-sm font-black leading-tight text-white group-hover:text-amber-100">
+              Đặt Bàn Trước
+            </h3>
+            <p className="text-[11px] text-amber-100/80 mt-0.5">
+              Chọn giờ & giữ bàn đẹp
+            </p>
+          </div>
+        </button>
+
+        {/* Nút 2: Mua mang về */}
+        <button
+          type="button"
+          onClick={() => openBooking('TAKEAWAY')}
+          className="p-3.5 rounded-2xl bg-gradient-to-br from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white shadow-lg shadow-orange-950/40 border border-orange-500/30 flex flex-col justify-between text-left transition-all active:scale-[0.98] cursor-pointer group"
+        >
+          <div className="flex items-center justify-between w-full mb-3">
+            <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
+              <ShoppingBag className="w-5 h-5 text-white" />
             </div>
+            <span className="text-[10px] font-bold bg-black/30 px-2 py-0.5 rounded-full text-orange-200">
+              Giao Tận Nơi
+            </span>
           </div>
-
-          {/* Quick Action Buttons on Banner */}
-          <div className="pt-2 flex items-center gap-2">
-            <button
-              onClick={() => openBooking('TAKEAWAY')}
-              type="button"
-              className="flex-1 py-2.5 px-3 rounded-xl bg-white text-neutral-900 hover:bg-neutral-100 text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-lg shadow-black/30 transition-all active:scale-95 cursor-pointer"
-            >
-              <ShoppingBag className="h-4 w-4 text-orange-600" />
-              <span>Xem Menu & Đặt Mang Về</span>
-            </button>
-            <button
-              onClick={() => openBooking('BOOK_TABLE')}
-              type="button"
-              className="py-2.5 px-3 rounded-xl bg-black/40 hover:bg-black/60 border border-white/20 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer"
-            >
-              <Utensils className="h-4 w-4 text-amber-300" />
-              <span>Đặt Bàn Quán</span>
-            </button>
+          <div>
+            <h3 className="text-sm font-black leading-tight text-white group-hover:text-orange-100">
+              Đặt Mang Về
+            </h3>
+            <p className="text-[11px] text-orange-100/80 mt-0.5">
+              Chọn món từ Menu nóng hổi
+            </p>
           </div>
-        </div>
-
-        {/* Decorative background glow */}
-        <div className="absolute -right-8 -bottom-8 h-40 w-40 rounded-full bg-amber-400/20 blur-2xl" />
+        </button>
       </div>
 
-      {/* Phía trên: Bộ chọn Chi nhánh của Thành viên B */}
-      <BranchSelector branches={branches} />
+      {/* Thẻ thông tin chi nhánh đang chọn */}
+      <div className="p-3 rounded-xl bg-stone-950 border border-stone-800 flex items-center justify-between text-xs">
+        <div className="flex items-center gap-2 text-stone-300 truncate">
+          <MapPin className="w-4 h-4 text-amber-500 shrink-0" />
+          <span className="font-semibold text-white truncate">{currentBranch?.name}</span>
+          <span className="text-[10px] text-stone-500 hidden sm:inline truncate">({currentBranch?.address})</span>
+        </div>
+        <div className="flex items-center gap-1 shrink-0 bg-amber-500/10 text-amber-400 font-bold px-2 py-0.5 rounded-lg border border-amber-500/20 text-[11px]">
+          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+          <span>{currentBranch?.avgRating.toFixed(1)}</span>
+        </div>
+      </div>
 
-      {/* Phía dưới: Nhúng luồng Đánh giá của Thành viên A */}
-      <ReviewFeed branchId={currentBranch?.id} />
+      {/* ------------------------------------------------------------- */}
+      {/* KHỐI 3: DÒNG THỜI GIAN BÀI ĐÁNH GIÁ CỦA THỰC KHÁCH (REVIEW FEED) */}
+      {/* ------------------------------------------------------------- */}
+      <div className="pt-1">
+        <ReviewFeed branchId={currentBranch?.id} />
+      </div>
     </div>
   );
 }
 
 export default function CustomerHomePage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-neutral-400">Đang tải trải nghiệm Lẩu Mắm...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-xs text-stone-500">Đang tải Lẩu Mắm Trăm Rưỡi...</div>}>
       <CustomerHomeContent />
     </Suspense>
   );

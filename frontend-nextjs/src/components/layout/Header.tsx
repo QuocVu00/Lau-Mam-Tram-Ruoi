@@ -1,82 +1,64 @@
 'use client';
 
 /**
- * @author Thành viên B (Task B1.1)
- * @description Thanh Header chuẩn Mobile-First cho Khách hàng (Role 1),
- * tích hợp hiển thị tên quán "Lẩu Mắm Trăm Rưỡi" và bộ chọn nhanh Chi nhánh.
+ * @file frontend-nextjs/src/components/layout/Header.tsx
+ * @description Thanh Header gọn gàng cho giao diện điện thoại khách vãng lai:
+ * Hiển thị tên quán và nút Đăng nhập khách hàng.
  */
 
-import React from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { MapPin, Sparkles, Phone } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { Flame, UserCheck, User } from 'lucide-react';
 
-interface BranchItem {
-  id: string;
-  name: string;
-  address: string;
-  phone: string;
-  avgRating: number;
-  totalActiveReviews: number;
-}
+export function Header() {
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
-interface HeaderProps {
-  branches?: BranchItem[];
-  currentBranchId?: string;
-}
-
-export function Header({ branches = [], currentBranchId }: HeaderProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const activeBranchId = currentBranchId || searchParams.get('branchId') || (branches[0]?.id ?? '');
-
-  const activeBranch = branches.find((b) => b.id === activeBranchId) || branches[0];
-
-  const handleBranchChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newBranchId = e.target.value;
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('branchId', newBranchId);
-    router.push(`/?${params.toString()}`);
-  };
+  useEffect(() => {
+    // Kiểm tra xem khách đã đăng nhập chưa
+    if (typeof window !== 'undefined') {
+      const userInfo = localStorage.getItem('user_info');
+      if (userInfo) {
+        try {
+          setCurrentUser(JSON.parse(userInfo));
+        } catch {}
+      }
+    }
+  }, []);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-neutral-800 bg-neutral-950/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-lg items-center justify-between px-4 py-3">
-        {/* Brand & Logo */}
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-md shadow-orange-950/50">
-            <Sparkles className="h-5 w-5 text-white" />
+    <header className="sticky top-0 z-40 w-full border-b border-stone-800 bg-stone-900/95 backdrop-blur-md px-4 py-2.5">
+      <div className="flex items-center justify-between">
+        {/* Logo & Tên Quán */}
+        <Link href="/" className="flex items-center gap-2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 shadow-md shadow-orange-950/50">
+            <Flame className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h1 className="text-base font-extrabold tracking-tight text-white">
+            <h1 className="text-sm font-extrabold tracking-tight text-white leading-none">
               Lẩu Mắm Trăm Rưỡi
             </h1>
-            <p className="text-xs text-amber-400 font-medium flex items-center gap-1">
-              <span>Hương vị miền Tây chuẩn vị</span>
+            <p className="text-[10px] text-amber-400 font-semibold mt-0.5">
+              Đậm vị miền Tây
             </p>
           </div>
-        </div>
+        </Link>
 
-        {/* Branch Quick Selector */}
-        {branches.length > 0 ? (
-          <div className="flex items-center gap-1.5 bg-neutral-900 border border-neutral-800 rounded-xl px-2.5 py-1.5 max-w-[170px]">
-            <MapPin className="h-4 w-4 text-amber-500 shrink-0" />
-            <select
-              value={activeBranchId}
-              onChange={handleBranchChange}
-              className="bg-transparent text-xs text-neutral-200 font-medium focus:outline-none cursor-pointer truncate w-full"
-            >
-              {branches.map((b) => (
-                <option key={b.id} value={b.id} className="bg-neutral-900 text-neutral-200">
-                  {b.name}
-                </option>
-              ))}
-            </select>
+        {/* Nút Đăng nhập riêng cho Khách vãng lai */}
+        {currentUser ? (
+          <div className="flex items-center gap-1.5 bg-stone-800/80 px-2.5 py-1 rounded-full border border-stone-700 text-xs">
+            <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="text-[11px] font-semibold text-stone-200 truncate max-w-[90px]">
+              {currentUser.fullName}
+            </span>
           </div>
         ) : (
-          <div className="text-xs text-neutral-400 flex items-center gap-1">
-            <Phone className="h-3.5 w-3.5 text-amber-500" />
-            <span>0909 150 150</span>
-          </div>
+          <Link
+            href="/customer-login"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-bold transition-all"
+          >
+            <User className="w-3.5 h-3.5" />
+            <span>Đăng nhập</span>
+          </Link>
         )}
       </div>
     </header>
