@@ -9,6 +9,7 @@ import React, { useState } from 'react';
 import { X, Store, MapPin, Phone, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { apiClient } from '@/lib/api';
 
 interface AdminBranchModalProps {
   isOpen: boolean;
@@ -35,19 +36,10 @@ export function AdminBranchModal({
     setIsLoading(true);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      const res = await fetch(`${apiUrl}/branches`, {
+      await apiClient('/branches', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ name, address, phone }),
       });
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Không thể tạo chi nhánh mới');
-      }
 
       setName('');
       setAddress('');
@@ -55,7 +47,7 @@ export function AdminBranchModal({
       onSuccess();
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Đã có lỗi xảy ra');
+      setError(err.message || 'Đã có lỗi xảy ra khi tạo chi nhánh');
     } finally {
       setIsLoading(false);
     }

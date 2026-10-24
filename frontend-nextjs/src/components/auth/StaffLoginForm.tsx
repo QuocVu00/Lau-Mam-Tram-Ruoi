@@ -48,9 +48,9 @@ export default function StaffLoginForm() {
       // Bước 3: Tự động điều hướng theo đúng vai trò (Role-based Routing)
       setTimeout(() => {
         if (result.user.role === 'ADMIN') {
-          router.push('/admin/logs'); // Admin vào trang Lịch sử xóa
+          router.push('/admin/branches'); // Admin vào thẳng trang Quản lý Chi nhánh
         } else {
-          router.push('/manager/reviews'); // Quản lý vào trang Quản lý đánh giá chi nhánh
+          router.push('/manager/bookings'); // Quản lý vào trang Quản lý đơn đặt bàn
         }
       }, 800);
     } catch (err: any) {
@@ -64,10 +64,10 @@ export default function StaffLoginForm() {
   const handleQuickFill = (role: 'ADMIN' | 'MANAGER') => {
     if (role === 'ADMIN') {
       setEmail('admin@laumam.vn');
-      setPassword('admin123');
+      setPassword('123456');
     } else {
-      setEmail('manager.q1@laumam.vn');
-      setPassword('manager123');
+      setEmail('vuga@gmail.com');
+      setPassword('123456');
     }
   };
 

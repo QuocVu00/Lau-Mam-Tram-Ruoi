@@ -15,6 +15,7 @@ import { AdminBranchModal } from '@/components/branches/AdminBranchModal';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { apiClient } from '@/lib/api';
 
 interface BranchItem {
   id: string;
@@ -51,16 +52,12 @@ export default function AdminBranchesPage() {
   const fetchBranches = async () => {
     setIsLoading(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      const res = await fetch(`${apiUrl}/branches`);
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          setBranches(data);
-        }
+      const data = await apiClient<BranchItem[]>('/branches');
+      if (Array.isArray(data) && data.length > 0) {
+        setBranches(data);
       }
     } catch (e) {
-      console.warn('API backend chưa chạy, dùng dữ liệu mẫu');
+      console.warn('Lỗi lấy danh sách chi nhánh:', e);
     } finally {
       setIsLoading(false);
     }
