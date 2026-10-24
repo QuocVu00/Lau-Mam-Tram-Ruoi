@@ -8,10 +8,10 @@ import { IsNotEmpty, IsString, IsOptional, IsInt, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class QueryReviewDto {
-  // Lọc đánh giá theo chi nhánh cụ thể
+  // Lọc đánh giá theo chi nhánh cụ thể (hoặc lấy tất cả nếu không truyền)
   @IsString({ message: 'branchId phải là chuỗi ký tự!' })
-  @IsNotEmpty({ message: 'Vui lòng cung cấp branchId cần lấy đánh giá!' })
-  branchId: string;
+  @IsOptional()
+  branchId?: string;
 
   // Trang số mấy (mặc định trang 1)
   @Type(() => Number) // Tự động ép kiểu chuỗi từ URL "?page=1" thành số 1
