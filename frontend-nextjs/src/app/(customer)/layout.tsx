@@ -2,12 +2,13 @@
 
 /**
  * @file frontend-nextjs/src/app/(customer)/layout.tsx
- * @description Layout giao diện điện thoại mặc định (Native Mobile Layout):
- * Tông màu Nâu đất miền Tây, chứa Header, BottomNav, Drawer Đặt bàn
- * và cơ chế tự động đăng nhập tài khoản Google khách hàng khi lần đầu vào web.
+ * @description Layout responsive cho luồng khách hàng:
+ * - Trên điện thoại: Chiếm toàn màn hình, Header cố định trên, BottomNav cố định dưới
+ * - Trên màn hình lớn (PC/tablet): Giới hạn max-w-lg, căn giữa cho dễ đọc
+ * - Tự động đổi màu theo chế độ sáng/tối của thiết bị
  */
 
-import React, { Suspense, useEffect } from 'react';
+import React from 'react';
 import { Header } from '@/components/layout/Header';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { BookingDrawerZalo } from '@/components/bookings/BookingDrawerZalo';
@@ -17,29 +18,29 @@ function CustomerLayoutInner({ children }: { children: React.ReactNode }) {
   const { isOpen, closeBooking, bookingType, openBooking } = useBooking();
 
   return (
-    // Container bao bọc toàn màn hình nền Nâu đất nung
-    <div className="min-h-screen bg-[#120703] text-amber-100 flex justify-center">
-      
-      {/* Khung màn hình điện thoại mặc định tông màu Nâu Miền Tây (max-w-md ~ 448px) */}
-      <div className="w-full max-w-md min-h-screen flex flex-col bg-[#241209] border-x border-amber-900/60 shadow-2xl relative">
-        
-        {/* Nội dung trang chính */}
-        <main className="flex-1 px-4 py-3 pb-24 overflow-y-auto">
-          {children}
-        </main>
+    // Bọc nền toàn trang theo màu hệ thống
+    <div className="min-h-screen w-full bg-[var(--bg-app)]">
 
-        {/* Thanh Bottom Navigation cố định đáy */}
-        <BottomNav onOpenBookingDrawer={() => openBooking('TAKEAWAY')} />
+      {/* Header sticky cố định trên cùng - hiển thị trên mọi trang con */}
+      <Header />
 
-        {/* Drawer Đặt bàn / Đặt món mang về qua Zalo */}
-        <BookingDrawerZalo
-          isOpen={isOpen}
-          onClose={closeBooking}
-          branchId="branch-q1-uuid-demo"
-          branchName="Lẩu Mắm Trăm Rưỡi - Quận 1"
-          initialType={bookingType}
-        />
-      </div>
+      {/* Nội dung trang: full-width trên điện thoại, giới hạn max-w-lg và căn giữa trên PC
+           pt-4: đệm trên sau Header, pb-28: đệm dưới tránh bị BottomNav che */}
+      <main className="w-full max-w-lg mx-auto px-4 pt-4 pb-28">
+        {children}
+      </main>
+
+      {/* Thanh điều hướng cố định đáy — hiển thị trên mọi kích thước màn hình */}
+      <BottomNav onOpenBookingDrawer={() => openBooking('TAKEAWAY')} />
+
+      {/* Ngăn kéo Đặt bàn / Mang về */}
+      <BookingDrawerZalo
+        isOpen={isOpen}
+        onClose={closeBooking}
+        branchId="branch-q1-uuid-demo"
+        branchName="Lẩu Mắm Trăm Rưỡi - Quận 1"
+        initialType={bookingType}
+      />
     </div>
   );
 }

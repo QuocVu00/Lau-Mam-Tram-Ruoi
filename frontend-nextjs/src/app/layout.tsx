@@ -28,7 +28,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi" className="h-full antialiased">
-      <body className={`${inter.className} min-h-full flex flex-col bg-neutral-950 text-neutral-100`}>
+      {/* Nền và chữ của body tự động chuyển đổi theo màu của máy (CSS Variables: --bg-app, --text-main) */}
+      <body className={`${inter.className} min-h-full flex flex-col bg-[var(--bg-app)] text-[var(--text-main)] transition-colors duration-200`}>
         {children}
       </body>
     </html>

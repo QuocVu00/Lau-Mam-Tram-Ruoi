@@ -12,7 +12,6 @@ import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Store, Star, Award } from 'lucide-react';
-import { Header } from '@/components/layout/Header';
 import { ReviewFeed } from '@/components/reviews/ReviewFeed';
 
 function CustomerReviewsContent() {
@@ -20,8 +19,10 @@ function CustomerReviewsContent() {
   const router = useRouter();
   const branchParam = searchParams.get('branchId') || 'ALL';
 
+  // Chi nhánh đang được lọc để xem hoặc viết đánh giá
   const [selectedBranchId, setSelectedBranchId] = useState<string>(branchParam);
 
+  // Xử lý chuyển đổi chi nhánh qua URL query parameter
   const handleFilterBranch = (branchId: string) => {
     setSelectedBranchId(branchId);
     if (branchId === 'ALL') {
@@ -32,46 +33,44 @@ function CustomerReviewsContent() {
   };
 
   return (
-    <div className="space-y-4 text-amber-100">
-      {/* Header trang đánh giá */}
-      <div className="-mx-4 -mt-3 mb-2">
-        <Header currentBranchName="Đánh giá" />
-      </div>
+    <div className="space-y-4 transition-colors duration-200">
 
-      {/* Nút quay lại trang giới thiệu */}
+      {/* Thanh điều hướng quay lại trang giới thiệu */}
       <div className="flex items-center justify-between pt-1">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-yellow-400 hover:text-yellow-300 transition-colors bg-[#2e160c] px-3 py-1.5 rounded-xl border border-amber-800/60"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--primary)] hover:opacity-80 transition-all bg-[var(--bg-muted)] px-3 py-1.5 rounded-xl border border-[var(--border-color)] active:scale-95"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Về trang giới thiệu</span>
+          <span>Về trang chủ</span>
         </Link>
 
-        <span className="text-[11px] font-bold text-amber-300 bg-amber-950/80 px-2.5 py-1 rounded-xl border border-amber-600/40">
-          Trải nghiệm thực khách
+        <span className="text-[11px] font-bold text-[var(--text-sub)] bg-[var(--bg-muted)] px-2.5 py-1 rounded-xl border border-[var(--border-color)]">
+          Đánh giá thực khách
         </span>
       </div>
 
-      {/* Thông báo phân định nghiệp vụ: Mục Tổng tất cả chỉ để xem, chọn chi nhánh mới được viết bài */}
+      {/* Hộp thông báo phân định nghiệp vụ */}
       {selectedBranchId === 'ALL' && (
-        <div className="p-3 rounded-2xl bg-[#281309] border border-amber-800/60 text-xs text-amber-200/90 flex items-center justify-between gap-2 shadow-md">
+        <div className="p-3.5 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] text-xs text-[var(--text-main)] flex items-center justify-between gap-2 shadow-xs">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-yellow-400 animate-ping" />
-            <span>Mục <strong>Tất cả</strong> chỉ hiển thị xem. Chọn một chi nhánh bên dưới để viết đánh giá!</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping shrink-0" />
+            <span className="text-[11px] leading-relaxed">
+              Mục <strong>Tất cả</strong> để xem tổng hợp. Vui lòng bấm chọn chi nhánh bên dưới để viết đánh giá!
+            </span>
           </div>
         </div>
       )}
 
-      {/* Thanh chọn nhanh lọc chi nhánh */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+      {/* Thanh cuộn ngang chọn chi nhánh lọc (Filter Chips) */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
         <button
           type="button"
           onClick={() => handleFilterBranch('ALL')}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer ${
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer active:scale-95 ${
             selectedBranchId === 'ALL'
-              ? 'bg-yellow-400 text-stone-950 shadow-md'
-              : 'bg-[#281309] text-amber-300 border border-amber-800/60'
+              ? 'bg-gradient-to-r from-amber-600 to-yellow-600 text-stone-950 font-black shadow-xs'
+              : 'bg-[var(--bg-muted)] text-[var(--text-main)] border border-[var(--border-color)]'
           }`}
         >
           Tất cả chi nhánh
@@ -80,10 +79,10 @@ function CustomerReviewsContent() {
         <button
           type="button"
           onClick={() => handleFilterBranch('branch-q1-uuid-demo')}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer ${
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer active:scale-95 ${
             selectedBranchId === 'branch-q1-uuid-demo'
-              ? 'bg-yellow-400 text-stone-950 shadow-md'
-              : 'bg-[#281309] text-amber-300 border border-amber-800/60'
+              ? 'bg-gradient-to-r from-amber-600 to-yellow-600 text-stone-950 font-black shadow-xs'
+              : 'bg-[var(--bg-muted)] text-[var(--text-main)] border border-[var(--border-color)]'
           }`}
         >
           Chi nhánh Quận 1
@@ -92,19 +91,22 @@ function CustomerReviewsContent() {
         <button
           type="button"
           onClick={() => handleFilterBranch('b2-default')}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer ${
+          className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer active:scale-95 ${
             selectedBranchId === 'b2-default'
-              ? 'bg-yellow-400 text-stone-950 shadow-md'
-              : 'bg-[#281309] text-amber-300 border border-amber-800/60'
+              ? 'bg-gradient-to-r from-amber-600 to-yellow-600 text-stone-950 font-black shadow-xs'
+              : 'bg-[var(--bg-muted)] text-[var(--text-main)] border border-[var(--border-color)]'
           }`}
         >
           Chi nhánh Bình Thạnh
         </button>
       </div>
 
-      {/* Danh sách bài đánh giá */}
-      <div className="pt-2">
-        <ReviewFeed branchId={selectedBranchId} />
+      {/* Danh sách các bài đánh giá của chi nhánh */}
+      <div className="pt-1">
+        <ReviewFeed
+          branchId={selectedBranchId}
+          onSelectReviewBranch={handleFilterBranch}
+        />
       </div>
     </div>
   );

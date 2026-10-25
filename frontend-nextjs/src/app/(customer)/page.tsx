@@ -28,7 +28,6 @@ import {
   MessageSquareText,
   ChevronRight,
 } from 'lucide-react';
-import { Header } from '@/components/layout/Header';
 import { useBooking } from '@/context/BookingContext';
 
 interface BranchInfo {
@@ -63,106 +62,137 @@ export default function CustomerIntroPage() {
   const router = useRouter();
   const { openBooking } = useBooking();
 
-  // Chi nhánh đang được khách bấm chọn xem chi tiết trong khung
+  // Chi nhánh đang được khách chọn để xem thông tin
   const [selectedBranch, setSelectedBranch] = useState<BranchInfo>(BRANCHES[0]);
 
-  return (
-    <div className="space-y-4 text-amber-100 pb-4">
-      {/* Header điện thoại */}
-      <div className="-mx-4 -mt-3 mb-1">
-        <Header currentBranchName={selectedBranch.name} />
-      </div>
+  // Trạng thái theme: 'system' (theo màu máy), 'light' (sáng), hoặc 'dark' (tối)
+  const [themeMode, setThemeMode] = useState<'system' | 'light' | 'dark'>('system');
 
-      {/* 1. BANNER GIỚI THIỆU ĐẶC SẢN MIỀN TÂY */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#3d1e10] via-[#2a1309] to-[#1a0a04] p-5 border-2 border-amber-600/40 shadow-xl shadow-black/80">
-        <div className="flex items-center justify-between mb-3">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-600 to-yellow-600 text-stone-950 font-black text-[11px] shadow-sm">
+  // Hàm chuyển đổi chế độ màu linh hoạt theo ý muốn
+  const toggleTheme = () => {
+    const nextTheme = themeMode === 'system' ? 'dark' : themeMode === 'dark' ? 'light' : 'system';
+    setThemeMode(nextTheme);
+
+    const root = document.documentElement;
+    if (nextTheme === 'dark') {
+      root.classList.add('dark');
+    } else if (nextTheme === 'light') {
+      root.classList.remove('dark');
+    } else {
+      // Chế độ 'system': Tuân theo màu của máy điện thoại
+      const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (isSystemDark) {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
+    }
+  };
+
+  return (
+    <div className="space-y-4 pb-2 transition-colors duration-200">
+
+      {/* 2. BANNER MÓN LẨU MẮM TRỨ DANH - ĐẬM CHẤT MIỀN TÂY */}
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-600 via-amber-700 to-amber-900 text-amber-50 p-5 shadow-lg border border-amber-500/40">
+        {/* Họa tiết trang trí nền tinh tế */}
+        <div className="absolute -top-10 -right-10 w-36 h-36 bg-yellow-400/20 rounded-full blur-2xl pointer-events-none" />
+
+        <div className="flex items-center justify-between mb-3 relative z-10">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-400 text-stone-950 font-black text-[11px] shadow-xs">
             <Award className="w-3.5 h-3.5" />
             <span>ĐẶC SẢN MIỀN TÂY</span>
           </span>
 
-          <span className="text-xs font-black text-yellow-400 bg-amber-950/80 px-2.5 py-1 rounded-xl border border-amber-600/30">
+          <span className="text-xs font-black text-yellow-300 bg-stone-950/60 backdrop-blur-md px-3 py-1 rounded-xl border border-yellow-400/40">
             150.000đ/người
           </span>
         </div>
 
-        <h2 className="text-lg font-black text-yellow-400 leading-tight">
+        <h2 className="text-lg font-black text-white leading-tight relative z-10">
           Lẩu Mắm Trăm Rưỡi Chuẩn Vị Nam Bộ
         </h2>
 
-        <p className="text-xs text-amber-200/80 mt-2 leading-relaxed">
-          Nồi lẩu mắm đậm đà nấu từ cốt <strong className="text-yellow-300">mắm cá linh, cá sặc Châu Đốc</strong> trứ danh, nước dừa tươi thanh ngọt, ăn kèm tôm cá tươi rói và mẹt <strong className="text-yellow-300">12 loại rau đồng xanh mướt</strong>.
+        <p className="text-xs text-amber-100/90 mt-2 leading-relaxed relative z-10">
+          Nồi lẩu mắm đậm đà ninh từ cốt <strong className="text-yellow-300">mắm cá linh, cá sặc Châu Đốc</strong> trứ danh, nước dừa tươi thanh ngọt, ăn kèm tôm cá tươi rói và mẹt <strong className="text-yellow-300">12 loại rau đồng xanh mướt</strong>.
         </p>
 
-        <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-amber-900/40 text-[11px]">
-          <div className="flex items-center gap-1.5 text-amber-300 font-medium">
-            <Fish className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
+        {/* Thông số món ăn & thời gian phục vụ */}
+        <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-amber-500/30 text-[11px] relative z-10">
+          <div className="flex items-center gap-1.5 text-amber-100 font-medium">
+            <Fish className="w-3.5 h-3.5 text-yellow-300 shrink-0" />
             <span>Mắm cá linh nguyên chất</span>
           </div>
-          <div className="flex items-center gap-1.5 text-amber-300 font-medium">
-            <Clock className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
+          <div className="flex items-center gap-1.5 text-amber-100 font-medium">
+            <Clock className="w-3.5 h-3.5 text-yellow-300 shrink-0" />
             <span>Mở cửa: 10h00 - 22h00</span>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* 2. HAI NÚT HÀNH ĐỘNG CỐT LÕI: ĐẶT BÀN & ĐẶT MANG VỀ */}
-      <div className="grid grid-cols-2 gap-2.5">
+      {/* 3. HAI NÚT HÀNH ĐỘNG CHÍNH DÀNH RIÊNG CHO NGÓN TAY CÁI TRÊN ĐIỆN THOẠI */}
+      <section className="grid grid-cols-2 gap-3">
+        {/* Nút 1: Đặt bàn ăn tại quán */}
         <button
           type="button"
           onClick={() => openBooking('BOOK_TABLE')}
-          className="p-3.5 rounded-2xl bg-gradient-to-br from-[#4d2513] to-[#2c1409] hover:from-[#5d2d17] hover:to-[#38190c] text-white shadow-lg border border-amber-500/40 flex flex-col justify-between text-left transition-all active:scale-[0.98] cursor-pointer"
+          className="p-4 rounded-2xl bg-[var(--bg-card)] hover:bg-[var(--bg-muted)] text-left shadow-sm border border-[var(--border-color)] flex flex-col justify-between transition-all active:scale-[0.97] cursor-pointer group"
         >
-          <div className="flex items-center justify-between w-full mb-2">
-            <div className="w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center">
-              <Utensils className="w-4 h-4 text-yellow-400" />
+          <div className="flex items-center justify-between w-full mb-3">
+            <div className="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center text-[var(--primary)] group-hover:scale-110 transition-transform">
+              <Utensils className="w-4 h-4 text-[var(--primary)]" />
             </div>
-            <span className="text-[10px] font-black bg-amber-500/20 text-yellow-300 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-black bg-[var(--bg-muted)] text-[var(--primary)] px-2 py-0.5 rounded-full border border-[var(--border-color)]">
               Tại Quán
             </span>
           </div>
           <div>
-            <h3 className="text-sm font-black text-yellow-400 leading-tight">
+            <h3 className="text-sm font-black text-[var(--text-main)] leading-tight">
               Đặt Bàn Trước
             </h3>
-            <p className="text-[10px] text-amber-200/70 mt-0.5">
+            <p className="text-[11px] text-[var(--text-sub)] mt-0.5">
               Giữ chỗ & phục vụ nhanh
             </p>
           </div>
         </button>
 
+        {/* Nút 2: Đặt món mang về qua Zalo */}
         <button
           type="button"
           onClick={() => openBooking('TAKEAWAY')}
-          className="p-3.5 rounded-2xl bg-gradient-to-br from-[#4d2513] to-[#2c1409] hover:from-[#5d2d17] hover:to-[#38190c] text-white shadow-lg border border-yellow-500/40 flex flex-col justify-between text-left transition-all active:scale-[0.98] cursor-pointer"
+          className="p-4 rounded-2xl bg-[var(--bg-card)] hover:bg-[var(--bg-muted)] text-left shadow-sm border border-[var(--border-color)] flex flex-col justify-between transition-all active:scale-[0.97] cursor-pointer group"
         >
-          <div className="flex items-center justify-between w-full mb-2">
-            <div className="w-8 h-8 rounded-xl bg-yellow-500/20 flex items-center justify-center">
-              <ShoppingBag className="w-4 h-4 text-yellow-400" />
+          <div className="flex items-center justify-between w-full mb-3">
+            <div className="w-9 h-9 rounded-xl bg-yellow-500/15 flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform">
+              <ShoppingBag className="w-4 h-4 text-amber-600" />
             </div>
-            <span className="text-[10px] font-black bg-yellow-500/20 text-yellow-300 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-black bg-[var(--bg-muted)] text-amber-600 px-2 py-0.5 rounded-full border border-[var(--border-color)]">
               Giao Tận Nơi
             </span>
           </div>
           <div>
-            <h3 className="text-sm font-black text-yellow-400 leading-tight">
+            <h3 className="text-sm font-black text-[var(--text-main)] leading-tight">
               Đặt Mang Về
             </h3>
-            <p className="text-[10px] text-amber-200/70 mt-0.5">
-              Xem Menu & chọn món
+            <p className="text-[11px] text-[var(--text-sub)] mt-0.5">
+              Xem Menu & giao món nóng
             </p>
           </div>
         </button>
-      </div>
+      </section>
 
-      {/* 3. KHUNG CHI NHÁNH ĐƠN GIẢN: ẤN VÀO ĐỂ THẤY CHI NHÁNH (ẢNH, TÊN, ĐỊA CHỈ) */}
-      <div className="rounded-3xl bg-[#281309] p-4 border border-amber-900/60 shadow-xl space-y-3">
-        <h3 className="text-xs font-black text-yellow-400 flex items-center gap-1.5 uppercase tracking-wider">
-          <Store className="w-4 h-4 text-amber-500" />
-          <span>Chọn Chi Nhánh Để Xem</span>
-        </h3>
+      {/* 4. KHUNG CHỌN CHI NHÁNH & THÔNG TIN LIÊN HỆ ĐIỆN THOẠI */}
+      <section className="rounded-3xl bg-[var(--bg-card)] p-4 border border-[var(--border-color)] shadow-sm space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-black text-[var(--text-main)] flex items-center gap-1.5 uppercase tracking-wider">
+            <Store className="w-4 h-4 text-[var(--primary)]" />
+            <span>Chọn Chi Nhánh Để Xem</span>
+          </h3>
+          <span className="text-[10px] text-[var(--text-sub)] font-medium">
+            2 Chi nhánh đang mở
+          </span>
+        </div>
 
-        {/* 2 tab chi nhánh để khách ấn chuyển đổi nhanh */}
+        {/* Tab chọn nhanh 2 chi nhánh */}
         <div className="grid grid-cols-2 gap-2">
           {BRANCHES.map((b) => {
             const isSelected = selectedBranch.id === b.id;
@@ -174,8 +204,8 @@ export default function CustomerIntroPage() {
                 onClick={() => setSelectedBranch(b)}
                 className={`py-2 px-2.5 rounded-xl text-xs font-bold transition-all text-center truncate border ${
                   isSelected
-                    ? 'bg-yellow-400 text-stone-950 border-yellow-400 shadow-md font-black'
-                    : 'bg-[#1c0d06] text-amber-300 border-amber-900/60 hover:border-amber-600/60'
+                    ? 'bg-gradient-to-r from-amber-600 to-yellow-600 text-stone-950 border-amber-600 shadow-xs font-black'
+                    : 'bg-[var(--bg-muted)] text-[var(--text-main)] border-[var(--border-color)] hover:opacity-90'
                 }`}
               >
                 {b.name}
@@ -184,8 +214,8 @@ export default function CustomerIntroPage() {
           })}
         </div>
 
-        {/* Khung hiển thị ĐƠN GIẢN: Ảnh chi nhánh, Tên, Địa chỉ */}
-        <div className="rounded-2xl overflow-hidden border-2 border-amber-600/40 bg-[#1c0d06] shadow-lg">
+        {/* Khung hiển thị chi tiết chi nhánh với nút gọi hotline điện thoại */}
+        <div className="rounded-2xl overflow-hidden border border-[var(--border-color)] bg-[var(--bg-muted)] shadow-sm">
           <div className="relative h-44 w-full">
             <Image
               src={selectedBranch.image}
@@ -195,42 +225,71 @@ export default function CustomerIntroPage() {
               sizes="(max-width: 448px) 100vw, 420px"
               priority
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
             
-            <div className="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur-md px-2.5 py-0.5 rounded-lg border border-yellow-500/40 flex items-center gap-1 text-[11px] font-bold text-yellow-400">
+            {/* Điểm đánh giá sao */}
+            <div className="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur-md px-2.5 py-0.5 rounded-lg border border-yellow-400/40 flex items-center gap-1 text-[11px] font-bold text-yellow-300">
               <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
               <span>{selectedBranch.avgRating.toFixed(1)} / 5.0</span>
             </div>
 
-            <div className="absolute bottom-3 left-3 right-3 text-white space-y-1">
-              <h4 className="text-sm font-black text-yellow-400">
+            {/* Thông tin địa chỉ & Hotline */}
+            <div className="absolute bottom-3 left-3 right-3 text-white space-y-1.5">
+              <h4 className="text-sm font-black text-yellow-300">
                 {selectedBranch.name}
               </h4>
-              <p className="text-xs text-amber-100 flex items-start gap-1">
-                <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+              <p className="text-xs text-stone-100 flex items-start gap-1">
+                <MapPin className="w-3.5 h-3.5 text-amber-300 shrink-0 mt-0.5" />
                 <span className="line-clamp-2">{selectedBranch.address}</span>
               </p>
-              <p className="text-[11px] text-amber-300/80 flex items-center gap-1 pt-0.5">
-                <Phone className="w-3 h-3 text-amber-400" />
-                <span>Hotline: {selectedBranch.phone}</span>
-              </p>
+              
+              {/* Nút bấm gọi điện thoại trực tiếp khi dùng trên di động */}
+              <div className="pt-1 flex items-center gap-2">
+                <a
+                  href={`tel:${selectedBranch.phone.replace(/\s+/g, '')}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-black text-[11px] shadow-sm transition-all active:scale-95 cursor-pointer"
+                  title="Bấm để gọi hotline chi nhánh"
+                >
+                  <Phone className="w-3 h-3 text-stone-950" />
+                  <span>Gọi: {selectedBranch.phone}</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* 4. NÚT CHUYỂN SANG TRANG ĐÁNH GIÁ (ẤN VÀO THÌ QUA XEM BÀI ĐÁNH GIÁ) */}
-      <div className="pt-1">
+      {/* 5. NÚT CHUYỂN SANG TRANG ĐÁNH GIÁ (TIỆN LỢI & NỔI BẬT) */}
+      <section className="pt-1">
         <Link
           href={`/reviews?branchId=${selectedBranch.id}`}
-          className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-stone-950 font-black text-xs flex items-center justify-between shadow-xl shadow-black/70 border border-yellow-300 transition-all active:scale-[0.98] cursor-pointer"
+          className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 hover:opacity-95 text-stone-950 font-black text-xs flex items-center justify-between shadow-md shadow-amber-900/15 border border-yellow-300/40 transition-all active:scale-[0.98] cursor-pointer"
         >
-          <div className="flex items-center gap-2">
-            <MessageSquareText className="w-4 h-4 text-stone-950" />
-            <span>Xem Bài Đánh Giá Của Khách Hàng</span>
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-stone-950/20 flex items-center justify-center">
+              <MessageSquareText className="w-4 h-4 text-stone-950" />
+            </div>
+            <div>
+              <p className="font-black text-xs leading-none">Xem Đánh Giá Khách Hàng</p>
+              <p className="text-[10px] text-stone-900/80 font-medium mt-0.5">Hình ảnh & video chân thực từ thực khách</p>
+            </div>
           </div>
           <ArrowRight className="w-4 h-4 text-stone-950" />
         </Link>
+      </section>
+
+      {/* 6. NÚT ĐỔI NHANH CHẾ ĐỘ MÀU (TỰ ĐỘNG THEO MÁY / SÁNG / TỐI) */}
+      <div className="pt-2 flex justify-center">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="text-[11px] font-semibold text-[var(--text-sub)] hover:text-[var(--text-main)] px-3 py-1 rounded-full border border-[var(--border-color)] bg-[var(--bg-muted)] active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
+        >
+          <span>Chế độ màu:</span>
+          <span className="font-bold text-[var(--primary)] uppercase">
+            {themeMode === 'system' ? 'Theo máy (Auto)' : themeMode === 'light' ? 'Sáng (Light)' : 'Tối (Dark)'}
+          </span>
+        </button>
       </div>
     </div>
   );
