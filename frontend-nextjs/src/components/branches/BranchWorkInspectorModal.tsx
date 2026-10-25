@@ -297,10 +297,10 @@ export function BranchWorkInspectorModal({
         </div>
 
         {/* ============================================================== */}
-        {/* TABS CHUYỂN ĐỔI                                                */}
+        {/* TABS CHUYỂN ĐỔI (Hỗ trợ cuộn ngang mượt mà trên Mobile)         */}
         {/* ============================================================== */}
-        <div className="px-5 pt-3 border-b border-neutral-800 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
+        <div className="px-4 sm:px-5 pt-3 border-b border-neutral-800 flex items-center justify-between gap-4 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             <button
               onClick={() => setActiveTab('ORDERS')}
               className={`pb-3 px-3 text-xs font-bold transition-all border-b-2 flex items-center gap-2 cursor-pointer ${

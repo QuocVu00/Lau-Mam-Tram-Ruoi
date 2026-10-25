@@ -33,13 +33,6 @@ Mở một cửa sổ Terminal (PowerShell hoặc Command Prompt) tại thư m�
 docker-compose up -d
 ```
 
-> **Giải thích lệnh:**
-> * `docker-compose up`: Đọc file `docker-compose.yml` và khởi tạo container database theo cấu hình có sẵn.
-> * `-d` (Detached mode): Chạy container dưới nền (background) để không khóa màn hình terminal.
-> * Database sẽ lắng nghe tại `localhost:5432` với tài khoản `postgres`, mật khẩu `password`, database tên `lau_mam_tram_ruoi`.
-
----
-
 ### 🔹 Bước 2: Cài Đặt và Khởi Động Backend (NestJS)
 
 Mở Terminal thứ 2 để chạy Backend:
@@ -61,14 +54,6 @@ npm run prisma:generate
 npm run start:dev
 ```
 
-> **Giải thích lệnh:**
-> * `npm install`: Tải toàn bộ các package cần thiết như NestJS, Prisma Client, JWT, Socket.io...
-> * `npm run prisma:push`: Đọc schema trong `prisma/schema.prisma` và tự động tạo các bảng (Users, Reviews, Bookings, Branches...) trên PostgreSQL.
-> * `npm run prisma:generate`: Cập nhật mã nguồn Prisma Client để NestJS truy vấn dữ liệu có type-safety.
-> * `npm run start:dev`: Khởi động backend trên cổng **3001** (`http://localhost:3001`), tự động tải lại (hot-reload) khi bạn sửa code.
-
----
-
 ### 🔹 Bước 3: Cài Đặt và Khởi Động Frontend (Next.js)
 
 Mở Terminal thứ 3 để chạy Frontend:
@@ -84,12 +69,6 @@ npm install
 npm run dev
 ```
 
-> **Giải thích lệnh:**
-> * `npm install`: Cài đặt các thư viện React, Lucide-React icon, Tailwind CSS, Socket.io Client...
-> * `npm run dev`: Chạy server giao diện web tại địa chỉ **`http://localhost:3000`**.
-
----
-
 ## 🌐 4. Truy Cập Hệ Thống
 
 Sau khi cả 2 server đều đang chạy:
@@ -103,22 +82,3 @@ Sau khi cả 2 server đều đang chạy:
 | **Prisma Studio (Xem dữ liệu trực quan)** | `npm run prisma:studio` (chạy trong thư mục `backend-nestjs`) | Mở trang `http://localhost:5555` để duyệt dữ liệu các bảng |
 
 ---
-
-## 🛠️ 5. Một Số Lỗi Thường Gặp & Cách Khắc Phục
-
-1. **Lỗi không kết nối được Database (`Can't reach database server at localhost:5432`)**:
-   * *Nguyên nhân*: Docker chưa mở hoặc container chưa chạy.
-   * *Khắc phục*: Mở Docker Desktop, sau đó gõ lệnh `docker-compose up -d` ở thư mục gốc.
-
-2. **Lỗi xung đột cổng (`Port 3000 is already in use` hoặc `Port 3001 is already in use`)**:
-   * *Nguyên nhân*: Có tiến trình khác hoặc phiên chạy cũ đang chiếm cổng.
-   * *Khắc phục*: Tắt các tiến trình node cũ qua Task Manager hoặc kiểm tra cổng bằng PowerShell:
-     ```powershell
-     # Tìm tiến trình đang chiếm cổng (ví dụ cổng 3001)
-     netstat -ano | findstr :3001
-     # Dừng tiến trình theo PID tìm được
-     taskkill /PID <PID_NUMBER> /F
-     ```
-
-3. **Lỗi hình ảnh từ domain ngoài trong Next.js**:
-   * Đã được cấu hình sẵn trong `next.config.ts` hỗ trợ tải ảnh từ `images.unsplash.com`. Nếu thêm domain ảnh mới, hãy thêm vào mảng `images.remotePatterns`.

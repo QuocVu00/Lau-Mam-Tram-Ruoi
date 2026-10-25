@@ -65,35 +65,13 @@ export default function CustomerIntroPage() {
   // Chi nhánh đang được khách chọn để xem thông tin
   const [selectedBranch, setSelectedBranch] = useState<BranchInfo>(BRANCHES[0]);
 
-  // Trạng thái theme: 'system' (theo màu máy), 'light' (sáng), hoặc 'dark' (tối)
-  const [themeMode, setThemeMode] = useState<'system' | 'light' | 'dark'>('system');
-
-  // Hàm chuyển đổi chế độ màu linh hoạt theo ý muốn
-  const toggleTheme = () => {
-    const nextTheme = themeMode === 'system' ? 'dark' : themeMode === 'dark' ? 'light' : 'system';
-    setThemeMode(nextTheme);
-
-    const root = document.documentElement;
-    if (nextTheme === 'dark') {
-      root.classList.add('dark');
-    } else if (nextTheme === 'light') {
-      root.classList.remove('dark');
-    } else {
-      // Chế độ 'system': Tuân theo màu của máy điện thoại
-      const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (isSystemDark) {
-        root.classList.add('dark');
-      } else {
-        root.classList.remove('dark');
-      }
-    }
-  };
-
   return (
-    <div className="space-y-4 pb-2 transition-colors duration-200">
+    <div className="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-12 lg:gap-6 pb-2 transition-colors duration-200">
 
-      {/* 2. BANNER MÓN LẨU MẮM TRỨ DANH - ĐẬM CHẤT MIỀN TÂY */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-600 via-amber-700 to-amber-900 text-amber-50 p-5 shadow-lg border border-amber-500/40">
+      {/* CỘT BÊN TRÁI TRÊN DESKTOP: Banner Món & Nút Xem Đánh Giá */}
+      <div className="lg:col-span-6 space-y-4">
+        {/* 2. BANNER MÓN LẨU MẮM TRỨ DANH - ĐẬM CHẤT MIỀN TÂY */}
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-600 via-amber-700 to-amber-900 text-amber-50 p-5 shadow-lg border border-amber-500/40">
         {/* Họa tiết trang trí nền tinh tế */}
         <div className="absolute -top-10 -right-10 w-36 h-36 bg-yellow-400/20 rounded-full blur-2xl pointer-events-none" />
 
@@ -129,56 +107,40 @@ export default function CustomerIntroPage() {
         </div>
       </section>
 
-      {/* 3. HAI NÚT HÀNH ĐỘNG CHÍNH DÀNH RIÊNG CHO NGÓN TAY CÁI TRÊN ĐIỆN THOẠI */}
-      <section className="grid grid-cols-2 gap-3">
-        {/* Nút 1: Đặt bàn ăn tại quán */}
-        <button
-          type="button"
-          onClick={() => openBooking('BOOK_TABLE')}
-          className="p-4 rounded-2xl bg-[var(--bg-card)] hover:bg-[var(--bg-muted)] text-left shadow-sm border border-[var(--border-color)] flex flex-col justify-between transition-all active:scale-[0.97] cursor-pointer group"
-        >
-          <div className="flex items-center justify-between w-full mb-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center text-[var(--primary)] group-hover:scale-110 transition-transform">
+      </div>
+
+      {/* CỘT BÊN PHẢI TRÊN DESKTOP: Đặt Bàn / Mang Về & Khung Chọn Chi Nhánh */}
+      <div className="lg:col-span-6 space-y-4">
+        {/* 3. HAI NÚT HÀNH ĐỘNG GỌN GÀNG (ĐÃ THU NHỎ & BỎ TEXT PHỤ / BADGE) */}
+        <section className="grid grid-cols-2 gap-2.5">
+          {/* Nút 1: Đặt bàn ăn tại quán */}
+          <button
+            type="button"
+            onClick={() => openBooking('BOOK_TABLE')}
+            className="px-3 py-2.5 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-muted)] text-left shadow-xs border border-[var(--border-color)] flex items-center gap-2.5 transition-all active:scale-[0.97] cursor-pointer group"
+          >
+            <div className="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center text-[var(--primary)] shrink-0 group-hover:scale-105 transition-transform">
               <Utensils className="w-4 h-4 text-[var(--primary)]" />
             </div>
-            <span className="text-[10px] font-black bg-[var(--bg-muted)] text-[var(--primary)] px-2 py-0.5 rounded-full border border-[var(--border-color)]">
-              Tại Quán
-            </span>
-          </div>
-          <div>
-            <h3 className="text-sm font-black text-[var(--text-main)] leading-tight">
+            <h3 className="text-xs font-black text-[var(--text-main)] truncate">
               Đặt Bàn Trước
             </h3>
-            <p className="text-[11px] text-[var(--text-sub)] mt-0.5">
-              Giữ chỗ & phục vụ nhanh
-            </p>
-          </div>
-        </button>
+          </button>
 
-        {/* Nút 2: Đặt món mang về qua Zalo */}
-        <button
-          type="button"
-          onClick={() => openBooking('TAKEAWAY')}
-          className="p-4 rounded-2xl bg-[var(--bg-card)] hover:bg-[var(--bg-muted)] text-left shadow-sm border border-[var(--border-color)] flex flex-col justify-between transition-all active:scale-[0.97] cursor-pointer group"
-        >
-          <div className="flex items-center justify-between w-full mb-3">
-            <div className="w-9 h-9 rounded-xl bg-yellow-500/15 flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform">
+          {/* Nút 2: Đặt món mang về qua Zalo */}
+          <button
+            type="button"
+            onClick={() => openBooking('TAKEAWAY')}
+            className="px-3 py-2.5 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-muted)] text-left shadow-xs border border-[var(--border-color)] flex items-center gap-2.5 transition-all active:scale-[0.97] cursor-pointer group"
+          >
+            <div className="w-8 h-8 rounded-lg bg-yellow-500/15 flex items-center justify-center text-amber-600 shrink-0 group-hover:scale-105 transition-transform">
               <ShoppingBag className="w-4 h-4 text-amber-600" />
             </div>
-            <span className="text-[10px] font-black bg-[var(--bg-muted)] text-amber-600 px-2 py-0.5 rounded-full border border-[var(--border-color)]">
-              Giao Tận Nơi
-            </span>
-          </div>
-          <div>
-            <h3 className="text-sm font-black text-[var(--text-main)] leading-tight">
+            <h3 className="text-xs font-black text-[var(--text-main)] truncate">
               Đặt Mang Về
             </h3>
-            <p className="text-[11px] text-[var(--text-sub)] mt-0.5">
-              Xem Menu & giao món nóng
-            </p>
-          </div>
-        </button>
-      </section>
+          </button>
+        </section>
 
       {/* 4. KHUNG CHỌN CHI NHÁNH & THÔNG TIN LIÊN HỆ ĐIỆN THOẠI */}
       <section className="rounded-3xl bg-[var(--bg-card)] p-4 border border-[var(--border-color)] shadow-sm space-y-3">
@@ -259,11 +221,11 @@ export default function CustomerIntroPage() {
         </div>
       </section>
 
-      {/* 5. NÚT CHUYỂN SANG TRANG ĐÁNH GIÁ (TIỆN LỢI & NỔI BẬT) */}
-      <section className="pt-1">
+      {/* NÚT CHUYỂN SANG TRANG ĐÁNH GIÁ (CHUYỂN XUỐNG CUỐI TRANG) */}
+      <section className="pt-2">
         <Link
           href={`/reviews?branchId=${selectedBranch.id}`}
-          className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 hover:opacity-95 text-stone-950 font-black text-xs flex items-center justify-between shadow-md shadow-amber-900/15 border border-yellow-300/40 transition-all active:scale-[0.98] cursor-pointer"
+          className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 hover:opacity-95 text-stone-950 font-black text-xs flex items-center justify-between shadow-md shadow-amber-900/15 border border-yellow-300/40 transition-all active:scale-[0.98] cursor-pointer"
         >
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-stone-950/20 flex items-center justify-center">
@@ -277,19 +239,6 @@ export default function CustomerIntroPage() {
           <ArrowRight className="w-4 h-4 text-stone-950" />
         </Link>
       </section>
-
-      {/* 6. NÚT ĐỔI NHANH CHẾ ĐỘ MÀU (TỰ ĐỘNG THEO MÁY / SÁNG / TỐI) */}
-      <div className="pt-2 flex justify-center">
-        <button
-          type="button"
-          onClick={toggleTheme}
-          className="text-[11px] font-semibold text-[var(--text-sub)] hover:text-[var(--text-main)] px-3 py-1 rounded-full border border-[var(--border-color)] bg-[var(--bg-muted)] active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
-        >
-          <span>Chế độ màu:</span>
-          <span className="font-bold text-[var(--primary)] uppercase">
-            {themeMode === 'system' ? 'Theo máy (Auto)' : themeMode === 'light' ? 'Sáng (Light)' : 'Tối (Dark)'}
-          </span>
-        </button>
       </div>
     </div>
   );

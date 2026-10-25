@@ -25,8 +25,8 @@ export function BottomNav({ onOpenBookingDrawer }: BottomNavProps) {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-[var(--border-color)] bg-[var(--bg-card)]/95 backdrop-blur-lg shadow-lg transition-colors duration-200">
-      {/* Vùng chứa giới hạn max-w-lg để đồng bộ với main content, full-width trên điện thoại */}
-      <div className="max-w-lg mx-auto flex items-center justify-between px-4 pt-2 pb-safe">
+      {/* Vùng chứa: full-width trên điện thoại, mở rộng cân đối trên máy tính */}
+      <div className="max-w-lg lg:max-w-5xl mx-auto flex items-center justify-between px-4 pt-2 pb-safe">
         
         {/* Nút 1: Trang chủ / Menu giới thiệu */}
         <Link

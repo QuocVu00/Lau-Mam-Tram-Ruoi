@@ -84,8 +84,8 @@ export function AdminSidebar({ role = 'ADMIN', branchName }: AdminSidebarProps) 
           </div>
         </div>
 
-        {/* Navigation Links */}
-        <nav className="flex flex-row md:flex-col gap-1.5 overflow-x-auto md:overflow-visible">
+        {/* Navigation Links: Tự động xếp ngang trên mobile có vuốt mượt, xếp dọc trên máy tính */}
+        <nav className="flex flex-row md:flex-col gap-1.5 overflow-x-auto md:overflow-visible pb-1 md:pb-0 scrollbar-none">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -115,18 +115,18 @@ export function AdminSidebar({ role = 'ADMIN', branchName }: AdminSidebarProps) 
         </nav>
       </div>
 
-      {/* Footer Navigation: Back to customer view & Logout */}
-      <div className="pt-4 border-t border-neutral-800 space-y-2 mt-4">
+      {/* Footer Navigation: Xếp ngang trên mobile, xếp dọc trên máy tính */}
+      <div className="pt-3 md:pt-4 border-t border-neutral-800 flex flex-row md:flex-col items-center md:items-stretch justify-between md:justify-start gap-2 mt-3 md:mt-4">
         <Link
           href="/"
-          className="flex items-center gap-2 px-3 py-2 text-xs text-neutral-400 hover:text-neutral-200 transition-colors"
+          className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 md:py-2 text-xs text-neutral-400 hover:text-neutral-200 transition-colors rounded-lg hover:bg-neutral-900"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          <span>Về trang chủ khách hàng</span>
+          <span>Về trang chủ</span>
         </Link>
         <Link
           href="/login"
-          className="flex items-center gap-2 px-3 py-2 text-xs text-red-400 hover:text-red-300 transition-colors"
+          className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 md:py-2 text-xs text-red-400 hover:text-red-300 transition-colors rounded-lg hover:bg-red-950/20"
         >
           <LogOut className="h-3.5 w-3.5" />
           <span>Đăng xuất</span>

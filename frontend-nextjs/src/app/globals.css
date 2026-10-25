@@ -98,3 +98,14 @@ body {
 .pb-safe {
   padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
 }
+
+/* Ẩn hoàn toàn nút tròn đen Next.js Dev Indicator ở góc màn hình */
+[data-nextjs-dev-tools-button],
+nextjs-portal,
+#nextjs-dev-tools,
+div[data-nextjs-dialog-overlay] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
