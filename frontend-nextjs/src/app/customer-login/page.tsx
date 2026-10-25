@@ -18,50 +18,56 @@ export default function CustomerLoginPage() {
   const [phone, setPhone] = useState('');
   const [fullName, setFullName] = useState('');
 
-  // Mô phỏng đăng nhập nhanh cho khách vãng lai bằng Google
-  const handleGoogleLogin = () => {
+  // Đăng nhập nhanh cho khách vãng lai bằng Google
+  const handleGoogleLogin = async () => {
     setIsLoading(true);
 
-    // Lưu thông tin khách mẫu vào localStorage để có quyền đăng bài đánh giá
-    const guestUser = {
-      id: 'guest-' + Date.now(),
-      email: 'thuc.khach@gmail.com',
-      fullName: 'Thực Khách Sành Ăn',
-      role: 'CUSTOMER',
-      branchId: null,
-      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80',
-    };
+    try {
+      const res: any = await apiClient('/auth/google', {
+        method: 'POST',
+        body: JSON.stringify({ credential: 'demo_google_one_tap' }),
+      });
 
-    localStorage.setItem('access_token', 'demo_customer_token_' + Date.now());
-    localStorage.setItem('user_info', JSON.stringify(guestUser));
+      localStorage.setItem('access_token', res.accessToken);
+      localStorage.setItem('user_info', JSON.stringify(res.user));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('auth_changed'));
+      }
 
-    setTimeout(() => {
-      setIsLoading(false);
       router.push('/'); // Quay lại trang chủ khách vãng lai
-    }, 600);
+    } catch (err: any) {
+      alert(err.message || 'Lỗi đăng nhập nhanh!');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Đăng nhập nhanh bằng tên và số điện thoại
-  const handlePhoneSubmit = (e: React.FormEvent) => {
+  const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phone || !fullName) return;
 
     setIsLoading(true);
-    const guestUser = {
-      id: 'guest-phone-' + Date.now(),
-      email: `${phone}@khachhang.laumam.vn`,
-      fullName: fullName.trim(),
-      role: 'CUSTOMER',
-      branchId: null,
-    };
 
-    localStorage.setItem('access_token', 'demo_phone_token_' + Date.now());
-    localStorage.setItem('user_info', JSON.stringify(guestUser));
+    try {
+      const credential = `demo_phone_${phone.trim()}_${encodeURIComponent(fullName.trim())}`;
+      const res: any = await apiClient('/auth/google', {
+        method: 'POST',
+        body: JSON.stringify({ credential }),
+      });
 
-    setTimeout(() => {
-      setIsLoading(false);
+      localStorage.setItem('access_token', res.accessToken);
+      localStorage.setItem('user_info', JSON.stringify(res.user));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('auth_changed'));
+      }
+
       router.push('/');
-    }, 600);
+    } catch (err: any) {
+      alert(err.message || 'Lỗi đăng nhập qua số điện thoại!');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -164,9 +170,17 @@ export default function CustomerLoginPage() {
         </div>
 
         {/* Chân trang */}
-        <p className="text-center text-[10px] text-stone-600 pt-4">
-          Lẩu Mắm Trăm Rưỡi • Nồng nàn hương vị quê hương
-        </p>
+        <div className="pt-4 text-center space-y-2 border-t border-stone-800/60 mt-4">
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-500 hover:text-amber-400 hover:underline transition-colors"
+          >
+            <span>Dành cho Quản lý quán & Tổng quản lý →</span>
+          </Link>
+          <p className="text-[10px] text-stone-600">
+            Lẩu Mắm Trăm Rưỡi • Nồng nàn hương vị quê hương
+          </p>
+        </div>
       </div>
     </main>
   );

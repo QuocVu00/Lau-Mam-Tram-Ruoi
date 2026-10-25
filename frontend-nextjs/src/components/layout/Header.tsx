@@ -2,16 +2,14 @@
 
 /**
  * @file frontend-nextjs/src/components/layout/Header.tsx
- * @description Thanh Header thích ứng màu theo máy (Light/Dark Mode) & chuẩn điện thoại:
- * - Tương thích notch tai thỏ với lớp pt-safe
- * - Nền mờ kính (Backdrop blur) thích ứng theo biến màu hệ thống
- * - Logo, Đổi nhanh chi nhánh, Trạng thái tài khoản
+ * @description Thanh Header tinh gọn theo yêu cầu:
+ * - Logo & Tên quán ở góc trái ban đầu kèm slogan đầy đủ
+ * - Không có nút đăng nhập / quản trị theo mong muốn giao diện
  */
 
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Store, ChevronDown } from 'lucide-react';
 
 interface HeaderProps {
   currentBranchName?: string;

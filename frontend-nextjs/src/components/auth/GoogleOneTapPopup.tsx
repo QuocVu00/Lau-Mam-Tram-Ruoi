@@ -7,11 +7,43 @@
  * (Placeholder sẵn sàng để Thành viên A tích hợp Google Identity Services - GIS)
  */
 
-import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Loader2 } from 'lucide-react';
+import { apiClient } from '@/lib/api';
 
 export function GoogleOneTapPopup() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('access_token');
+      // Hiển thị nếu chưa có token hoặc token là chuỗi mock cũ
+      if (!token || token.startsWith('demo_customer_token_') || token.startsWith('demo_phone_token_')) {
+        setIsOpen(true);
+      }
+    }
+  }, []);
+
+  const handleContinueAsCustomer = async () => {
+    setIsLoading(true);
+    try {
+      const res: any = await apiClient('/auth/google', {
+        method: 'POST',
+        body: JSON.stringify({ credential: 'demo_google_one_tap' }),
+      });
+      localStorage.setItem('access_token', res.accessToken);
+      localStorage.setItem('user_info', JSON.stringify(res.user));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('auth_changed'));
+      }
+      setIsOpen(false);
+    } catch (err) {
+      console.error('Lỗi đăng nhập nhanh:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -56,10 +88,18 @@ export function GoogleOneTapPopup() {
       <div className="mt-2.5">
         <button
           type="button"
-          onClick={() => setIsOpen(false)}
+          onClick={handleContinueAsCustomer}
+          disabled={isLoading}
           className="w-full py-1.5 px-3 rounded-xl bg-white hover:bg-neutral-100 text-neutral-900 text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
         >
-          <span>Tiếp tục dưới tên Khách Hàng</span>
+          {isLoading ? (
+            <>
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <span>Đang kết nối...</span>
+            </>
+          ) : (
+            <span>Tiếp tục dưới tên Khách Hàng</span>
+          )}
         </button>
       </div>
     </div>

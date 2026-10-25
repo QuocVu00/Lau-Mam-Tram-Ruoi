@@ -9,6 +9,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Users, Plus, Trash2, Mail, Store, ShieldAlert, CheckCircle, X, Loader2 } from 'lucide-react';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,7 @@ interface BranchItem {
 }
 
 export default function AdminStaffPage() {
+  const router = useRouter();
   const [staffList, setStaffList] = useState<StaffUser[]>([
     {
       id: 'usr-m1',
@@ -86,9 +88,27 @@ export default function AdminStaffPage() {
   };
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const userStr = localStorage.getItem('user_info');
+      const token = localStorage.getItem('access_token');
+      if (!token || !userStr) {
+        router.push('/login');
+        return;
+      }
+      try {
+        const user = JSON.parse(userStr);
+        if (user.role !== 'ADMIN') {
+          router.push('/manager/bookings');
+          return;
+        }
+      } catch {
+        router.push('/login');
+        return;
+      }
+    }
     fetchBranches();
     fetchStaff();
-  }, []);
+  }, [router]);
 
   const handleCreateManager = async (e: React.FormEvent) => {
     e.preventDefault();
