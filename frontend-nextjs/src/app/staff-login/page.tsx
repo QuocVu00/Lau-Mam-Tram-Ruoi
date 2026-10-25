@@ -4,6 +4,7 @@
  * Khách vãng lai không sử dụng trang này.
  */
 
+import { Suspense } from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Shield } from 'lucide-react';
@@ -38,7 +39,9 @@ export default function StaffLoginPage() {
         </div>
 
         {/* Form nhập Email & Mật khẩu */}
-        <StaffLoginForm />
+        <Suspense fallback={<div className="p-8 text-center text-xs text-stone-400">Đang tải biểu mẫu...</div>}>
+          <StaffLoginForm />
+        </Suspense>
       </div>
     </main>
   );

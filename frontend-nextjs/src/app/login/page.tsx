@@ -4,6 +4,7 @@
  * @author Thanh Vien A & B
  */
 
+import { Suspense } from 'react';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -28,7 +29,9 @@ export default function LoginPage() {
           <ArrowLeft className="h-4 w-4" />
           <span>Về trang chủ Lẩu Mắm</span>
         </Link>
-        <StaffLoginForm />
+        <Suspense fallback={<div className="p-8 text-center text-xs text-stone-400">Đang tải biểu mẫu...</div>}>
+          <StaffLoginForm />
+        </Suspense>
       </div>
     </main>
   );

@@ -18,6 +18,8 @@ import {
   LogOut,
   ArrowLeft,
   ShieldCheck,
+  BarChart3,
+  MessageSquare,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -34,6 +36,16 @@ export function AdminSidebar({ role = 'ADMIN', branchName }: AdminSidebarProps) 
       title: 'Quản lý Chi nhánh',
       href: '/admin/branches',
       icon: Store,
+    },
+    {
+      title: 'Tóm tắt Số sao',
+      href: '/admin/ratings',
+      icon: BarChart3,
+    },
+    {
+      title: 'Toàn bộ Đánh giá',
+      href: '/admin/reviews',
+      icon: MessageSquare,
     },
     {
       title: 'Quản lý Nhân sự (Role 2)',

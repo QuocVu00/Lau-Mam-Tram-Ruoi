@@ -23,18 +23,39 @@ export function Header({ currentBranchName, onChangeBranch }: HeaderProps) {
   const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
-    // Bước 1: Đọc thông tin phiên đăng nhập từ localStorage khi chạy trên trình duyệt
-    if (typeof window !== 'undefined') {
-      const userInfo = localStorage.getItem('user_info');
-      if (userInfo) {
-        try {
-          setCurrentUser(JSON.parse(userInfo));
-        } catch {
-          // Bỏ qua lỗi cú pháp JSON nếu chuỗi lưu trữ không đúng định dạng
+    const syncUser = () => {
+      if (typeof window !== 'undefined') {
+        const userInfo = localStorage.getItem('user_info');
+        if (userInfo) {
+          try {
+            setCurrentUser(JSON.parse(userInfo));
+          } catch {
+            setCurrentUser(null);
+          }
+        } else {
+          setCurrentUser(null);
         }
       }
-    }
+    };
+
+    syncUser();
+    window.addEventListener('auth_changed', syncUser);
+    window.addEventListener('storage', syncUser);
+
+    return () => {
+      window.removeEventListener('auth_changed', syncUser);
+      window.removeEventListener('storage', syncUser);
+    };
   }, []);
+
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user_info');
+      setCurrentUser(null);
+      window.dispatchEvent(new Event('auth_changed'));
+    }
+  };
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[var(--border-color)] bg-[var(--bg-card)]/90 backdrop-blur-md transition-colors duration-200">
@@ -81,13 +102,19 @@ export function Header({ currentBranchName, onChangeBranch }: HeaderProps) {
 
           {/* Trạng thái khách đăng nhập */}
           {currentUser ? (
-            <div className="flex items-center gap-1.5 bg-[var(--bg-muted)] px-2.5 py-1 rounded-full border border-[var(--border-color)] text-xs">
+            <button
+              type="button"
+              onClick={handleLogout}
+              title="Nhấn để đăng xuất hoặc đổi tài khoản"
+              className="flex items-center gap-1.5 bg-[var(--bg-muted)] hover:opacity-85 px-2.5 py-1 rounded-full border border-[var(--border-color)] text-xs transition-opacity cursor-pointer"
+            >
               {currentUser.avatarUrl ? (
                 <div className="relative w-4 h-4 rounded-full overflow-hidden border border-[var(--border-color)]">
                   <Image
                     src={currentUser.avatarUrl}
                     alt={currentUser.fullName}
                     fill
+                    unoptimized
                     className="object-cover"
                   />
                 </div>
@@ -97,7 +124,7 @@ export function Header({ currentBranchName, onChangeBranch }: HeaderProps) {
               <span className="text-[11px] font-bold text-[var(--text-main)] truncate max-w-[65px]">
                 {currentUser.fullName}
               </span>
-            </div>
+            </button>
           ) : (
             <Link
               href="/customer-login"

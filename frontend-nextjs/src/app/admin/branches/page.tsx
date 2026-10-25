@@ -9,6 +9,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Store, Plus, Star, MapPin, Phone, MessageSquare, RefreshCw, ChevronRight, Eye, ClipboardCheck } from 'lucide-react';
 import { AdminSidebar } from '@/components/layout/AdminSidebar';
 import { AdminBranchModal } from '@/components/branches/AdminBranchModal';
@@ -29,6 +30,7 @@ interface BranchItem {
 }
 
 export default function AdminBranchesPage() {
+  const router = useRouter();
   const [branches, setBranches] = useState<BranchItem[]>([
     {
       id: 'b1-default',
@@ -66,8 +68,27 @@ export default function AdminBranchesPage() {
   };
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const userStr = localStorage.getItem('user_info');
+      const token = localStorage.getItem('access_token');
+      if (!token || !userStr) {
+        router.push('/login');
+        return;
+      }
+      try {
+        const user = JSON.parse(userStr);
+        if (user.role !== 'ADMIN') {
+          // Quản lý chi nhánh không có quyền vào trang quản lý chi nhánh của Admin
+          router.push('/manager/bookings');
+          return;
+        }
+      } catch {
+        router.push('/login');
+        return;
+      }
+    }
     fetchBranches();
-  }, []);
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-neutral-950 flex flex-col md:flex-row">
@@ -115,8 +136,19 @@ export default function AdminBranchesPage() {
             <p className="text-xs text-neutral-400 font-medium">Tổng số chi nhánh</p>
             <p className="text-2xl font-black text-white mt-1">{branches.length}</p>
           </Card>
-          <Card className="p-4 bg-neutral-900/60 border-neutral-800">
-            <p className="text-xs text-neutral-400 font-medium">Điểm sao toàn hệ thống</p>
+          {/* Thẻ 2: Điểm sao toàn hệ thống -> Click mở trang Tóm tắt số sao */}
+          <Card
+            onClick={() => router.push('/admin/ratings')}
+            className="p-4 bg-neutral-900/60 border-neutral-800 hover:border-amber-500/60 hover:bg-neutral-900/90 transition-all cursor-pointer group shadow-sm"
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-neutral-400 font-medium group-hover:text-amber-400/90 transition-colors">
+                Điểm sao toàn hệ thống
+              </p>
+              <span className="text-[10px] text-amber-500 font-semibold opacity-80 group-hover:opacity-100 flex items-center transition-all">
+                Xem tóm tắt sao →
+              </span>
+            </div>
             <p className="text-2xl font-black text-amber-400 mt-1 flex items-center gap-1.5">
               <Star className="h-5 w-5 fill-amber-400" />
               {(
@@ -125,9 +157,21 @@ export default function AdminBranchesPage() {
               ).toFixed(1)}
             </p>
           </Card>
-          <Card className="p-4 bg-neutral-900/60 border-neutral-800">
-            <p className="text-xs text-neutral-400 font-medium">Tổng bài đánh giá hợp lệ</p>
-            <p className="text-2xl font-black text-white mt-1">
+
+          {/* Thẻ 3: Tổng bài đánh giá hợp lệ -> Click mở trang Danh sách bài đánh giá */}
+          <Card
+            onClick={() => router.push('/admin/reviews')}
+            className="p-4 bg-neutral-900/60 border-neutral-800 hover:border-amber-500/60 hover:bg-neutral-900/90 transition-all cursor-pointer group shadow-sm"
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-neutral-400 font-medium group-hover:text-amber-400/90 transition-colors">
+                Tổng bài đánh giá hợp lệ
+              </p>
+              <span className="text-[10px] text-amber-500 font-semibold opacity-80 group-hover:opacity-100 flex items-center transition-all">
+                Xem toàn bộ đánh giá →
+              </span>
+            </div>
+            <p className="text-2xl font-black text-white mt-1 group-hover:text-amber-300 transition-colors">
               {branches.reduce((acc, b) => acc + b.totalActiveReviews, 0)}
             </p>
           </Card>
