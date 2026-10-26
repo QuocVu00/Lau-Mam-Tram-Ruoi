@@ -11,22 +11,13 @@ import { UpdateBranchDto } from './dto/update-branch.dto';
 export class BranchesService {
   private fallbackBranches = [
     {
-      id: 'b1-default',
-      name: 'Lẩu Mắm Trăm Rưỡi - Quận 1',
-      address: '150 Nguyễn Trãi, P. Bến Thành, Quận 1, TP.HCM',
-      phone: '0909 150 150',
-      avgRating: 4.9,
-      totalActiveReviews: 128,
+      id: '79f67a99-a392-45c2-93ec-bdc2f18e0c0e',
+      name: 'Lẩu Mắm Tô Kí',
+      address: '01 Đường Tô Kí',
+      phone: '09091515',
+      avgRating: 5.0,
+      totalActiveReviews: 4,
       createdAt: new Date('2026-10-01'),
-    },
-    {
-      id: 'b2-default',
-      name: 'Lẩu Mắm Trăm Rưỡi - Bình Thạnh',
-      address: '280 Phan Xích Long nối dài, P. 2, Q. Phú Nhuận',
-      phone: '0909 150 151',
-      avgRating: 4.8,
-      totalActiveReviews: 96,
-      createdAt: new Date('2026-10-05'),
     },
   ];
 

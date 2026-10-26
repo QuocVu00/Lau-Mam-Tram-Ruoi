@@ -40,23 +40,15 @@ interface BranchInfo {
   image: string;
 }
 
-// Dữ liệu dự phòng hiển thị tạm thời khi hệ thống vừa tải trang
+// Dữ liệu chi nhánh dự phòng (chỉ còn duy nhất chi nhánh Tô Kí)
 const DEFAULT_BRANCHES: BranchInfo[] = [
   {
-    id: 'branch-q1-uuid-demo',
-    name: 'Chi nhánh Quận 1',
-    address: '150 Nguyễn Trãi, Phường Bến Thành, Quận 1, TP.HCM',
-    phone: '0901 234 567',
+    id: '79f67a99-a392-45c2-93ec-bdc2f18e0c0e',
+    name: 'Lẩu Mắm Tô Kí',
+    address: '01 Đường Tô Kí',
+    phone: '09091515',
     avgRating: 5.0,
     image: '/images/chinhanh1.jpg',
-  },
-  {
-    id: 'b2-default',
-    name: 'Chi nhánh Bình Thạnh',
-    address: '280 Phan Xích Long nối dài, Phường 2, Q. Phú Nhuận, TP.HCM',
-    phone: '0909 150 151',
-    avgRating: 4.8,
-    image: '/images/chinhanh3.jpg',
   },
 ];
 
@@ -159,36 +151,7 @@ export default function CustomerIntroPage() {
 
       {/* CỘT BÊN PHẢI TRÊN DESKTOP: Đặt Bàn / Mang Về & Khung Chọn Chi Nhánh */}
       <div className="lg:col-span-6 space-y-4">
-        {/* 3. HAI NÚT HÀNH ĐỘNG GỌN GÀNG (ĐÃ THU NHỎ & BỎ TEXT PHỤ / BADGE) */}
-        <section className="grid grid-cols-2 gap-2.5">
-          {/* Nút 1: Đặt bàn ăn tại quán */}
-          <button
-            type="button"
-            onClick={() => openBooking('BOOK_TABLE', { id: selectedBranch.id, name: selectedBranch.name })}
-            className="px-3 py-2.5 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-muted)] text-left shadow-xs border border-[var(--border-color)] flex items-center gap-2.5 transition-all active:scale-[0.97] cursor-pointer group"
-          >
-            <div className="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center text-[var(--primary)] shrink-0 group-hover:scale-105 transition-transform">
-              <Utensils className="w-4 h-4 text-[var(--primary)]" />
-            </div>
-            <h3 className="text-xs font-black text-[var(--text-main)] truncate">
-              Đặt Bàn Trước
-            </h3>
-          </button>
 
-          {/* Nút 2: Đặt món mang về qua Zalo */}
-          <button
-            type="button"
-            onClick={() => openBooking('TAKEAWAY', { id: selectedBranch.id, name: selectedBranch.name })}
-            className="px-3 py-2.5 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-muted)] text-left shadow-xs border border-[var(--border-color)] flex items-center gap-2.5 transition-all active:scale-[0.97] cursor-pointer group"
-          >
-            <div className="w-8 h-8 rounded-lg bg-yellow-500/15 flex items-center justify-center text-amber-600 shrink-0 group-hover:scale-105 transition-transform">
-              <ShoppingBag className="w-4 h-4 text-amber-600" />
-            </div>
-            <h3 className="text-xs font-black text-[var(--text-main)] truncate">
-              Đặt Mang Về
-            </h3>
-          </button>
-        </section>
 
         {/* 4. KHUNG CHỌN CHI NHÁNH & THÔNG TIN LIÊN HỆ ĐIỆN THOẠI */}
         <section className="rounded-3xl bg-[var(--bg-card)] p-4 border border-[var(--border-color)] shadow-sm space-y-3">
@@ -197,9 +160,6 @@ export default function CustomerIntroPage() {
               <Store className="w-4 h-4 text-[var(--primary)]" />
               <span>Chọn Chi Nhánh Để Xem</span>
             </h3>
-            <span className="text-[10px] text-[var(--text-sub)] font-medium">
-              2 Chi nhánh đang mở
-            </span>
           </div>
 
           {/* Tab chọn nhanh các chi nhánh từ Database */}
@@ -286,6 +246,47 @@ export default function CustomerIntroPage() {
             <ArrowRight className="w-4 h-4 text-stone-950" />
           </Link>
         </section>
+      </div>
+
+      {/* 
+        THANH NÚT CỐ ĐỊNH Ở ĐÁY MÀN HÌNH (BOTTOM FIXED BAR):
+        - fixed bottom-0 left-0 right-0 z-40: Giữ thanh này luôn nằm sát đáy màn hình dù người dùng cuộn lên hay xuống (tương tự như header nằm ở trên).
+        - bg-[var(--bg-card)]/95 backdrop-blur-md: Hiệu ứng kính mờ và nền tiệp với giao diện dark/light.
+        - border-t border-[var(--border-color)]: Đường viền ngăn cách sắc nét phía trên.
+        - max-w-lg lg:max-w-5xl mx-auto: Căn đều chiều rộng vừa khít với khung layout nội dung.
+      */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[var(--bg-card)]/95 backdrop-blur-md border-t border-[var(--border-color)] shadow-[0_-4px_16px_rgba(0,0,0,0.15)] px-4 py-2.5">
+        <div className="w-full max-w-lg lg:max-w-5xl mx-auto grid grid-cols-2 gap-2.5">
+          {/* Nút 1: Đặt bàn ăn tại quán */}
+          <button
+            type="button"
+            onClick={() => openBooking('BOOK_TABLE', { id: selectedBranch.id, name: selectedBranch.name })}
+            className="px-3 py-2.5 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-muted)] text-left shadow-xs border border-[var(--border-color)] flex items-center gap-2.5 transition-all active:scale-[0.97] cursor-pointer group"
+          >
+            {/* Icon đũa thìa với nền cam */}
+            <div className="w-8 h-8 rounded-lg bg-amber-500/15 flex items-center justify-center text-[var(--primary)] shrink-0 group-hover:scale-105 transition-transform">
+              <Utensils className="w-4 h-4 text-[var(--primary)]" />
+            </div>
+            <h3 className="text-xs font-black text-[var(--text-main)] truncate">
+              Đặt Bàn Trước
+            </h3>
+          </button>
+
+          {/* Nút 2: Đặt món mang về qua Zalo */}
+          <button
+            type="button"
+            onClick={() => openBooking('TAKEAWAY', { id: selectedBranch.id, name: selectedBranch.name })}
+            className="px-3 py-2.5 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-muted)] text-left shadow-xs border border-[var(--border-color)] flex items-center gap-2.5 transition-all active:scale-[0.97] cursor-pointer group"
+          >
+            {/* Icon túi mua mang về với nền vàng */}
+            <div className="w-8 h-8 rounded-lg bg-yellow-500/15 flex items-center justify-center text-amber-600 shrink-0 group-hover:scale-105 transition-transform">
+              <ShoppingBag className="w-4 h-4 text-amber-600" />
+            </div>
+            <h3 className="text-xs font-black text-[var(--text-main)] truncate">
+              Đặt Mang Về
+            </h3>
+          </button>
+        </div>
       </div>
     </div>
   );

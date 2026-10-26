@@ -29,10 +29,9 @@ function CustomerReviewsContent() {
   // Chi nhánh đang được lọc để xem hoặc viết đánh giá
   const [selectedBranchId, setSelectedBranchId] = useState<string>(branchParam);
 
-  // Danh sách các chi nhánh động tải từ Backend NestJS
+  // Danh sách các chi nhánh động tải từ Backend NestJS (dự phòng Tô Kí)
   const [branches, setBranches] = useState<BranchTab[]>([
-    { id: 'branch-q1-uuid-demo', name: 'Chi nhánh Quận 1' },
-    { id: 'b2-default', name: 'Chi nhánh Bình Thạnh' },
+    { id: '79f67a99-a392-45c2-93ec-bdc2f18e0c0e', name: 'Lẩu Mắm Tô Kí' },
   ]);
 
   // Tự động tải danh sách chi nhánh trực tiếp từ Backend khi mở trang

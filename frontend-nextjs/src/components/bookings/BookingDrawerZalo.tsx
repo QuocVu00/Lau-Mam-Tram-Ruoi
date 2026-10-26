@@ -10,7 +10,7 @@
  *    đến Quản lý chi nhánh qua API & Socket.io Realtime.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import {
   X,
@@ -29,6 +29,7 @@ import {
   Sparkles,
   ArrowRight,
   Info,
+  MapPin,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -148,8 +149,16 @@ export function BookingDrawerZalo({
   initialType = 'TAKEAWAY',
 }: BookingDrawerZaloProps) {
   const [type, setType] = useState<'BOOK_TABLE' | 'TAKEAWAY'>(initialType);
+
+  // Tự động đồng bộ loại popup theo nút mà khách vừa bấm (Đặt Bàn hoặc Đặt Mang Về)
+  useEffect(() => {
+    if (isOpen && initialType) {
+      setType(initialType);
+    }
+  }, [isOpen, initialType]);
   const [customerName, setCustomerName] = useState('');
   const [zaloPhone, setZaloPhone] = useState('');
+  const [address, setAddress] = useState('');
   const [guestCount, setGuestCount] = useState<number>(2);
   const [userNote, setUserNote] = useState('');
 
@@ -193,7 +202,11 @@ export function BookingDrawerZalo({
   // Đóng gói danh sách món thành chuỗi chi tiết gửi đi
   const formatOrderDetails = () => {
     if (type === 'BOOK_TABLE') {
-      return userNote.trim() || 'Khách đặt bàn ăn tại quán';
+      let details = userNote.trim() || 'Khách đặt bàn ăn tại quán';
+      if (address.trim()) {
+        details += `\n* Địa chỉ khách: ${address.trim()}`;
+      }
+      return details;
     }
 
     const itemLines = Object.entries(selectedItems)
@@ -207,8 +220,12 @@ export function BookingDrawerZalo({
 
     let fullDetails = `[ĐƠN MANG VỀ ĐÃ CHỌN MÓN]\n${itemLines || '• (Chưa chọn món cụ thể, liên hệ Zalo)'}\n=> TỔNG TẠM TÍNH: ${totalPrice.toLocaleString('vi-VN')}đ`;
 
+    if (address.trim()) {
+      fullDetails += `\n* Địa chỉ giao / khách: ${address.trim()}`;
+    }
+
     if (userNote.trim()) {
-      fullDetails += `\n* Ghi chú khách: ${userNote.trim()}`;
+      fullDetails += `\n* Ghi chú: ${userNote.trim()}`;
     }
 
     return fullDetails;
@@ -254,6 +271,7 @@ export function BookingDrawerZalo({
     setIsSuccess(false);
     setCustomerName('');
     setZaloPhone('');
+    setAddress('');
     setUserNote('');
     setSelectedItems({ m2: 1 });
     onClose();
@@ -261,29 +279,29 @@ export function BookingDrawerZalo({
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-        <div className="w-full max-w-lg rounded-t-3xl border-t border-neutral-800 bg-neutral-900 p-5 shadow-2xl animate-in slide-in-from-bottom duration-300 max-h-[94vh] overflow-y-auto">
-          {/* Drawer Handle */}
-          <div className="w-12 h-1.5 bg-neutral-700 rounded-full mx-auto mb-3" />
+      <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+        {/* Khung nội dung: Chiếm full toàn bộ chiều cao trên di động (h-full), bo tròn đẹp trên tablet/desktop */}
+        <div className="w-full max-w-lg h-full sm:h-auto sm:max-h-[94vh] sm:rounded-3xl border-t sm:border border-[var(--border-color)] bg-[var(--bg-card)] p-5 shadow-2xl animate-in slide-in-from-bottom duration-300 overflow-y-auto flex flex-col justify-between">
+          <div>
 
-          {/* Drawer Header */}
-          <div className="flex items-center justify-between pb-3 border-b border-neutral-800">
+          {/* Tiêu đề Drawer */}
+          <div className="flex items-center justify-between pb-3 border-b border-[var(--border-color)]">
             <div>
-              <h3 className="font-extrabold text-base text-white flex items-center gap-2">
+              <h3 className="font-extrabold text-base text-[var(--text-main)] flex items-center gap-2">
                 {type === 'TAKEAWAY' ? (
-                  <ShoppingBag className="h-5 w-5 text-amber-500" />
+                  <ShoppingBag className="h-5 w-5 text-[var(--primary)]" />
                 ) : (
-                  <CalendarDays className="h-5 w-5 text-amber-500" />
+                  <CalendarDays className="h-5 w-5 text-[var(--primary)]" />
                 )}
                 <span>{type === 'TAKEAWAY' ? 'Đặt Mang Về Chọn Món' : 'Đặt Bàn Ăn Tại Quán'}</span>
               </h3>
-              <p className="text-xs text-neutral-400 mt-0.5">
-                Chi nhánh: <span className="text-amber-400 font-medium">{branchName}</span>
+              <p className="text-xs text-[var(--text-sub)] mt-0.5">
+                Chi nhánh: <span className="text-[var(--primary)] font-medium">{branchName}</span>
               </p>
             </div>
             <button
               onClick={handleResetAndClose}
-              className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
+              className="p-1.5 rounded-lg text-[var(--text-sub)] hover:text-[var(--text-main)] hover:bg-[var(--bg-muted)] transition-colors cursor-pointer"
             >
               <X className="h-5 w-5" />
             </button>
@@ -341,55 +359,19 @@ export function BookingDrawerZalo({
                 </div>
               )}
 
-              {/* Chuyển đổi tab: Ăn tại quán vs Mang về */}
-              <div className="grid grid-cols-2 gap-2 p-1 bg-neutral-950 rounded-2xl border border-neutral-800">
-                <button
-                  type="button"
-                  onClick={() => setType('TAKEAWAY')}
-                  className={cn(
-                    'flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer',
-                    type === 'TAKEAWAY'
-                      ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md'
-                      : 'text-neutral-400 hover:text-neutral-200',
-                  )}
-                >
-                  <ShoppingBag className="h-4 w-4" />
-                  <span>Mua Mang Về</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setType('BOOK_TABLE')}
-                  className={cn(
-                    'flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer',
-                    type === 'BOOK_TABLE'
-                      ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md'
-                      : 'text-neutral-400 hover:text-neutral-200',
-                  )}
-                >
-                  <Utensils className="h-4 w-4" />
-                  <span>Ăn Tại Quán</span>
-                </button>
-              </div>
+
 
               {/* =======================================================
                   KHU VỰC 2 ẢNH MENU ĐỂ KHÁCH CHỌN MÓN (CHẾ ĐỘ MANG VỀ)
                   ======================================================= */}
               {type === 'TAKEAWAY' && (
                 <div className="space-y-3 pt-1">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
-                      <Sparkles className="h-4 w-4 text-amber-400" />
-                      <span>Xem Menu & Chọn Món Nhanh (Chạm để phóng to)</span>
-                    </label>
-                    <span className="text-[10px] text-neutral-400">2 Bảng Menu</span>
-                  </div>
-
-                  {/* Lưới 2 ảnh Menu */}
+                  {/* Lưới 2 ảnh Menu (Đã bỏ thanh tiêu đề và nhãn số lượng bảng menu) */}
                   <div className="grid grid-cols-2 gap-2.5">
                     {/* Ảnh Menu 1: Set Lẩu & Hải Sản */}
                     <div
                       onClick={() => setPreviewImage('/images/menu1.jpg')}
-                      className="group relative rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-950 cursor-pointer hover:border-amber-500/80 transition-all shadow-md"
+                      className="group relative rounded-2xl overflow-hidden border border-[var(--border-color)] bg-[var(--bg-muted)] cursor-pointer hover:border-[var(--primary)] transition-all shadow-xs"
                     >
                       <div className="relative aspect-[3/4] w-full">
                         <Image
@@ -399,12 +381,9 @@ export function BookingDrawerZalo({
                           sizes="(max-width: 768px) 50vw, 300px"
                           className="object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 opacity-90 group-hover:opacity-75 transition-opacity" />
-                        <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white">
-                          <span className="text-[11px] font-extrabold truncate">
-                            Menu 1: Set Lẩu & Hải Sản
-                          </span>
-                          <ZoomIn className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                        <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
+                        <div className="absolute bottom-2 right-2 p-1.5 rounded-lg bg-black/50 backdrop-blur-xs text-white">
+                          <ZoomIn className="h-3.5 w-3.5 text-amber-300 shrink-0" />
                         </div>
                       </div>
                     </div>
@@ -412,7 +391,7 @@ export function BookingDrawerZalo({
                     {/* Ảnh Menu 2: Rau Rừng & Đồ Uống */}
                     <div
                       onClick={() => setPreviewImage('/images/menu2.jpg')}
-                      className="group relative rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-950 cursor-pointer hover:border-amber-500/80 transition-all shadow-md"
+                      className="group relative rounded-2xl overflow-hidden border border-[var(--border-color)] bg-[var(--bg-muted)] cursor-pointer hover:border-[var(--primary)] transition-all shadow-xs"
                     >
                       <div className="relative aspect-[3/4] w-full">
                         <Image
@@ -422,25 +401,18 @@ export function BookingDrawerZalo({
                           sizes="(max-width: 768px) 50vw, 300px"
                           className="object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 opacity-90 group-hover:opacity-75 transition-opacity" />
-                        <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white">
-                          <span className="text-[11px] font-extrabold truncate">
-                            Menu 2: Rau Rừng & Đồ Uống
-                          </span>
-                          <ZoomIn className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                        <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
+                        <div className="absolute bottom-2 right-2 p-1.5 rounded-lg bg-black/50 backdrop-blur-xs text-white">
+                          <ZoomIn className="h-3.5 w-3.5 text-amber-300 shrink-0" />
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Danh sách chọn món trực tiếp từ Menu (Interactive Item Selector) */}
+                  {/* Danh sách chọn món trực tiếp từ Menu (Đã bỏ dòng chữ tiêu đề Chọn số lượng...) */}
                   <div className="space-y-2 mt-2">
-                    <p className="text-[11px] font-semibold text-neutral-300 flex items-center gap-1">
-                      <Utensils className="h-3.5 w-3.5 text-amber-500" />
-                      <span>Chọn số lượng từng món mang về:</span>
-                    </p>
 
-                    <div className="divide-y divide-neutral-800/80 rounded-2xl border border-neutral-800 bg-neutral-950/60 max-h-56 overflow-y-auto px-3">
+                    <div className="divide-y divide-[var(--border-color)] rounded-2xl border border-[var(--border-color)] bg-[var(--bg-muted)]/50 max-h-56 overflow-y-auto px-3">
                       {MENU_ITEMS.map((item) => {
                         const qty = selectedItems[item.id] || 0;
                         return (
@@ -450,7 +422,7 @@ export function BookingDrawerZalo({
                           >
                             <div className="space-y-0.5 flex-1 min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <span className="font-bold text-white truncate">
+                                <span className="font-bold text-[var(--text-main)] truncate">
                                   {item.name}
                                 </span>
                                 {item.category === 'HOTPOT' && (
@@ -459,33 +431,33 @@ export function BookingDrawerZalo({
                                   </Badge>
                                 )}
                               </div>
-                              <p className="text-[10px] text-amber-400 font-medium">
+                              <p className="text-[10px] text-[var(--primary)] font-semibold">
                                 {item.price.toLocaleString('vi-VN')}đ / {item.unit}
                               </p>
                               {item.description && (
-                                <p className="text-[10px] text-neutral-400 truncate">
+                                <p className="text-[10px] text-[var(--text-sub)] truncate">
                                   {item.description}
                                 </p>
                               )}
                             </div>
 
                             {/* Bộ nút tăng / giảm số lượng */}
-                            <div className="flex items-center gap-2 shrink-0 bg-neutral-900 border border-neutral-800 rounded-xl p-1">
+                            <div className="flex items-center gap-2 shrink-0 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl p-1 shadow-xs">
                               <button
                                 type="button"
                                 onClick={() => handleItemQuantityChange(item.id, -1)}
                                 disabled={qty === 0}
-                                className="h-6 w-6 rounded-lg bg-neutral-800 text-neutral-300 hover:text-white flex items-center justify-center disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
+                                className="h-6 w-6 rounded-lg bg-[var(--bg-muted)] text-[var(--text-sub)] hover:text-[var(--text-main)] flex items-center justify-center disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
                               >
                                 <Minus className="h-3 w-3" />
                               </button>
-                              <span className="w-5 text-center font-extrabold text-xs text-white">
+                              <span className="w-5 text-center font-extrabold text-xs text-[var(--text-main)]">
                                 {qty}
                               </span>
                               <button
                                 type="button"
                                 onClick={() => handleItemQuantityChange(item.id, 1)}
-                                className="h-6 w-6 rounded-lg bg-amber-500 text-white hover:bg-amber-600 flex items-center justify-center cursor-pointer shadow-sm"
+                                className="h-6 w-6 rounded-lg bg-[var(--primary)] text-white hover:opacity-90 flex items-center justify-center cursor-pointer shadow-xs"
                               >
                                 <Plus className="h-3 w-3" />
                               </button>
@@ -496,13 +468,13 @@ export function BookingDrawerZalo({
                     </div>
 
                     {/* Hộp tổng kết tạm tính */}
-                    <div className="p-3 rounded-xl bg-neutral-950 border border-amber-500/40 flex items-center justify-between text-xs">
-                      <span className="text-neutral-300 font-medium">
-                        Đã chọn: <span className="font-bold text-white">{totalItemCount} món</span>
+                    <div className="p-3 rounded-xl bg-[var(--bg-muted)] border border-[var(--border-color)] flex items-center justify-between text-xs">
+                      <span className="text-[var(--text-main)] font-medium">
+                        Đã chọn: <span className="font-bold text-[var(--primary)]">{totalItemCount} món</span>
                       </span>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-neutral-400">Tạm tính:</span>
-                        <span className="font-extrabold text-sm text-amber-400">
+                        <span className="text-[var(--text-sub)]">Tạm tính:</span>
+                        <span className="font-extrabold text-sm text-[var(--primary)]">
                           {totalPrice.toLocaleString('vi-VN')}đ
                         </span>
                       </div>
@@ -515,8 +487,8 @@ export function BookingDrawerZalo({
               <div className="space-y-3 pt-1">
                 {/* Họ tên */}
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-neutral-300 flex items-center gap-1.5">
-                    <User className="h-3.5 w-3.5 text-amber-500" />
+                  <label className="text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5">
+                    <User className="h-3.5 w-3.5 text-[var(--primary)]" />
                     <span>Họ và Tên người đặt *</span>
                   </label>
                   <Input
@@ -529,8 +501,8 @@ export function BookingDrawerZalo({
 
                 {/* SĐT Zalo */}
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-neutral-300 flex items-center gap-1.5">
-                    <Phone className="h-3.5 w-3.5 text-amber-500" />
+                  <label className="text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5">
+                    <Phone className="h-3.5 w-3.5 text-[var(--primary)]" />
                     <span>Số điện thoại dùng Zalo (để nhận xác nhận) *</span>
                   </label>
                   <Input
@@ -542,38 +514,54 @@ export function BookingDrawerZalo({
                   />
                 </div>
 
-                {/* Số khách nếu là BOOK_TABLE */}
+                {/* Số khách nếu là BOOK_TABLE (Ăn Tại Quán) */}
                 {type === 'BOOK_TABLE' && (
                   <div className="space-y-1.5">
-                    <label className="text-xs font-semibold text-neutral-300 flex items-center gap-1.5">
-                      <Users className="h-3.5 w-3.5 text-amber-500" />
+                    <label className="text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5">
+                      <Users className="h-3.5 w-3.5 text-[var(--primary)]" />
                       <span>Số lượng khách dự kiến *</span>
                     </label>
-                    <div className="flex items-center gap-2">
-                      {[2, 4, 6, 8, 10].map((num) => (
+                    <div className="grid grid-cols-6 gap-1.5">
+                      {[2, 4, 6, 8, 10, 13].map((num) => (
                         <button
                           key={num}
                           type="button"
                           onClick={() => setGuestCount(num)}
                           className={cn(
-                            'flex-1 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer',
+                            'py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer text-center',
                             guestCount === num
-                              ? 'bg-amber-500/20 border-amber-500 text-amber-400'
-                              : 'bg-neutral-800/80 border-neutral-700 text-neutral-300 hover:border-neutral-600',
+                              ? 'bg-[var(--primary)] text-white border-[var(--primary)] shadow-sm'
+                              : 'bg-[var(--bg-muted)] border-[var(--border-color)] text-[var(--text-sub)] hover:text-[var(--text-main)]',
                           )}
                         >
-                          {num} người
+                          {num === 13 ? '>12 người' : `${num} người`}
                         </button>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Ghi chú thêm */}
+                {/* Ô nhập Địa chỉ: CHỈ HIỂN THỊ KHI ĐẶT MANG VỀ (TAKEAWAY), không hiển thị khi ăn tại quán */}
+                {type === 'TAKEAWAY' && (
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5">
+                      <MapPin className="h-3.5 w-3.5 text-[var(--primary)]" />
+                      <span>Địa chỉ giao hàng *</span>
+                    </label>
+                    <Input
+                      required
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      placeholder="VD: 123 Đường Tô Kí, P. Tân Chánh Hiệp, Quận 12"
+                    />
+                  </div>
+                )}
+
+                {/* Ghi chú */}
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-neutral-300 flex items-center gap-1.5">
-                    <FileText className="h-3.5 w-3.5 text-amber-500" />
-                    <span>Ghi chú thêm về khẩu vị / giờ lấy</span>
+                  <label className="text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5">
+                    <FileText className="h-3.5 w-3.5 text-[var(--primary)]" />
+                    <span>Ghi chú</span>
                   </label>
                   <Input
                     value={userNote}
@@ -588,30 +576,33 @@ export function BookingDrawerZalo({
               </div>
 
               {/* Nút gửi đơn hàng */}
-              <Button
-                type="submit"
-                variant="primary"
-                className="w-full h-12 text-sm font-bold mt-2"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Đang gửi món đến Quản lý...
-                  </>
-                ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    <span>
-                      {type === 'TAKEAWAY'
-                        ? `Gửi Đơn Mang Về Cho Quán (${totalPrice > 0 ? totalPrice.toLocaleString('vi-VN') + 'đ' : 'Chọn món'})`
-                        : 'Xác Nhận Đặt Bàn Tại Quán'}
+              <div className="pt-2">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  className="w-full h-12 text-sm font-bold shadow-md cursor-pointer"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Đang gửi món đến Quản lý...
+                    </>
+                  ) : (
+                    <span className="flex items-center justify-center gap-2">
+                      <span>
+                        {type === 'TAKEAWAY'
+                          ? `Gửi Đơn Mang Về Cho Quán (${totalPrice > 0 ? totalPrice.toLocaleString('vi-VN') + 'đ' : 'Chọn món'})`
+                          : 'Xác Nhận Đặt Bàn Tại Quán'}
+                      </span>
+                      <ArrowRight className="h-4 w-4" />
                     </span>
-                    <ArrowRight className="h-4 w-4" />
-                  </span>
-                )}
-              </Button>
+                  )}
+                </Button>
+              </div>
             </form>
           )}
+          </div>
         </div>
       </div>
 

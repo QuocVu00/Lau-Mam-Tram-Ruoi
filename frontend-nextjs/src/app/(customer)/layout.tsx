@@ -24,8 +24,8 @@ function CustomerLayoutInner({ children }: { children: React.ReactNode }) {
       {/* Header sticky cố định trên cùng - hiển thị trên mọi trang con */}
       <Header />
 
-      {/* Nội dung trang: trên điện thoại full màn hình (max-w-md), trên tablet/desktop mở rộng tối đa 5xl */}
-      <main className="w-full max-w-lg lg:max-w-5xl mx-auto px-4 pt-4 pb-10">
+      {/* Nội dung trang: thêm pb-24 (khoảng đệm dưới) để tránh bị thanh nút Đặt bàn / Mang về cố định che khuất */}
+      <main className="w-full max-w-lg lg:max-w-5xl mx-auto px-4 pt-4 pb-24">
         {children}
       </main>
 
