@@ -15,34 +15,8 @@ export const metadata: Metadata = {
   description: 'Dành riêng cho Quản lý chi nhánh và Quản trị viên hệ thống.',
 };
 
+import { redirect } from 'next/navigation';
+
 export default function StaffLoginPage() {
-  return (
-    <main className="min-h-screen w-full flex flex-col items-center justify-center p-4 bg-stone-950 text-stone-100 relative">
-      {/* Nền hiệu ứng nhận diện cổng bảo mật nội bộ */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-amber-600/10 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="relative z-10 w-full max-w-md space-y-4">
-        {/* Nút quay lại trang trải nghiệm khách hàng */}
-        <div className="flex items-center justify-between">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-xs text-stone-400 hover:text-white transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Về trang khách hàng</span>
-          </Link>
-
-          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-500 bg-amber-950/50 px-2.5 py-1 rounded-full border border-amber-500/30">
-            <Shield className="w-3.5 h-3.5" />
-            <span>Cổng Quản Trị</span>
-          </span>
-        </div>
-
-        {/* Form nhập Email & Mật khẩu */}
-        <Suspense fallback={<div className="p-8 text-center text-xs text-stone-400">Đang tải biểu mẫu...</div>}>
-          <StaffLoginForm />
-        </Suspense>
-      </div>
-    </main>
-  );
+  redirect('/login');
 }

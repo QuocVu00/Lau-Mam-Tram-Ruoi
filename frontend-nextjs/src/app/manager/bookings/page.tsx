@@ -9,7 +9,8 @@
  * Hiển thị nổi bật chi tiết danh sách món khách chọn từ 2 Menu mang về.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Bell,
   Phone,
@@ -44,10 +45,32 @@ interface BookingItem {
 }
 
 export default function ManagerBookingsPage() {
+  const router = useRouter();
   const currentBranchId = 'b1-default';
   const currentBranchName = 'Lẩu Mắm Trăm Rưỡi - Quận 1';
 
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const userStr = localStorage.getItem('user_info');
+      const token = localStorage.getItem('access_token');
+      if (!token || !userStr) {
+        router.push('/login');
+        return;
+      }
+      try {
+        const user = JSON.parse(userStr);
+        if (user.role !== 'MANAGER' && user.role !== 'ADMIN') {
+          router.push('/login');
+          return;
+        }
+      } catch {
+        router.push('/login');
+        return;
+      }
+    }
+  }, [router]);
 
   const [bookings, setBookings] = useState<BookingItem[]>([
     {

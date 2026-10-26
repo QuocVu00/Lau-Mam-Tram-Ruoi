@@ -34,8 +34,7 @@ export default function ManagerReviewsPage() {
       const token = localStorage.getItem('access_token');
 
       if (!token || !userStr) {
-        // Fallback for mock demo
-        setCurrentUser({ fullName: 'Quản Lý Quán', role: 'MANAGER', branchId: null });
+        router.push('/login');
         return;
       }
 

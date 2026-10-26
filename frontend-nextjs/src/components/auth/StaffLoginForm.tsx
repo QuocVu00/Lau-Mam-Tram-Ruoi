@@ -70,13 +70,15 @@ export default function StaffLoginForm() {
     }
   };
 
-  // Tự động kích hoạt nếu có tham số URL ?role=admin hoặc ?role=manager
+  // Hỗ trợ gợi ý email và mật khẩu nếu có tham số URL ?role=admin hoặc ?role=manager
   useEffect(() => {
     const roleParam = searchParams.get('role');
     if (roleParam === 'admin') {
-      executeLogin('admin@laumam.vn', 'admin123');
+      setEmail('admin@laumam.vn');
+      setPassword('admin123');
     } else if (roleParam === 'manager') {
-      executeLogin('manager.q1@laumam.vn', 'manager123');
+      setEmail('manager.q1@laumam.vn');
+      setPassword('manager123');
     }
   }, [searchParams]);
 
