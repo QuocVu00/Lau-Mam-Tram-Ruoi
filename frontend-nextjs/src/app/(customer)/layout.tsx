@@ -14,7 +14,8 @@ import { BookingDrawerZalo } from '@/components/bookings/BookingDrawerZalo';
 import { BookingProvider, useBooking } from '@/context/BookingContext';
 
 function CustomerLayoutInner({ children }: { children: React.ReactNode }) {
-  const { isOpen, closeBooking, bookingType, openBooking } = useBooking();
+  // Trích xuất trạng thái đóng/mở, loại đặt món, và chi nhánh được khách hàng chọn từ context
+  const { isOpen, closeBooking, bookingType, selectedBranch } = useBooking();
 
   return (
     // Bọc nền toàn trang theo màu hệ thống
@@ -28,12 +29,12 @@ function CustomerLayoutInner({ children }: { children: React.ReactNode }) {
         {children}
       </main>
 
-      {/* Ngăn kéo Đặt bàn / Mang về */}
+      {/* Ngăn kéo Đặt bàn / Mang về: Truyền branchId và branchName thực tế của chi nhánh được chọn */}
       <BookingDrawerZalo
         isOpen={isOpen}
         onClose={closeBooking}
-        branchId="branch-q1-uuid-demo"
-        branchName="Lẩu Mắm Trăm Rưỡi - Quận 1"
+        branchId={selectedBranch.id}
+        branchName={selectedBranch.name}
         initialType={bookingType}
       />
     </div>

@@ -4,15 +4,22 @@
  * @file frontend-nextjs/src/app/(customer)/reviews/page.tsx
  * @description Trang BÀI ĐÁNH GIÁ RIÊNG BIỆT:
  * - Hiển thị các bài đánh giá kèm tên chi nhánh
- * - Có bộ lọc chi nhánh hoặc xem tất cả
+ * - Có bộ lọc chi nhánh lấy động từ Backend NestJS hoặc xem tất cả
  * - Nút viết đánh giá (chụp ảnh, quay video, thư viện)
  */
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Store, Star, Award } from 'lucide-react';
 import { ReviewFeed } from '@/components/reviews/ReviewFeed';
+import { apiClient } from '@/lib/api';
+
+// Định nghĩa kiểu dữ liệu chi nhánh
+interface BranchTab {
+  id: string;
+  name: string;
+}
 
 function CustomerReviewsContent() {
   const searchParams = useSearchParams();
@@ -21,6 +28,35 @@ function CustomerReviewsContent() {
 
   // Chi nhánh đang được lọc để xem hoặc viết đánh giá
   const [selectedBranchId, setSelectedBranchId] = useState<string>(branchParam);
+
+  // Danh sách các chi nhánh động tải từ Backend NestJS
+  const [branches, setBranches] = useState<BranchTab[]>([
+    { id: 'branch-q1-uuid-demo', name: 'Chi nhánh Quận 1' },
+    { id: 'b2-default', name: 'Chi nhánh Bình Thạnh' },
+  ]);
+
+  // Tự động tải danh sách chi nhánh trực tiếp từ Backend khi mở trang
+  useEffect(() => {
+    async function loadBranches() {
+      try {
+        // Gửi GET /branches tới NestJS
+        const data = await apiClient<any[]>('/branches');
+        if (Array.isArray(data) && data.length > 0) {
+          // Lấy ID và Tên của từng chi nhánh để làm danh sách tab lọc
+          setBranches(
+            data.map((b) => ({
+              id: b.id,
+              name: b.name,
+            })),
+          );
+        }
+      } catch (err) {
+        console.warn('Không thể tải chi nhánh từ backend cho trang reviews:', err);
+      }
+    }
+
+    loadBranches();
+  }, []);
 
   // Xử lý chuyển đổi chi nhánh qua URL query parameter
   const handleFilterBranch = (branchId: string) => {
@@ -64,6 +100,7 @@ function CustomerReviewsContent() {
 
       {/* Thanh cuộn ngang chọn chi nhánh lọc (Filter Chips) */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+        {/* Nút lọc tất cả các chi nhánh */}
         <button
           type="button"
           onClick={() => handleFilterBranch('ALL')}
@@ -76,29 +113,21 @@ function CustomerReviewsContent() {
           Tất cả chi nhánh
         </button>
 
-        <button
-          type="button"
-          onClick={() => handleFilterBranch('branch-q1-uuid-demo')}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer active:scale-95 ${
-            selectedBranchId === 'branch-q1-uuid-demo'
-              ? 'bg-gradient-to-r from-amber-600 to-yellow-600 text-stone-950 font-black shadow-xs'
-              : 'bg-[var(--bg-muted)] text-[var(--text-main)] border border-[var(--border-color)]'
-          }`}
-        >
-          Chi nhánh Quận 1
-        </button>
-
-        <button
-          type="button"
-          onClick={() => handleFilterBranch('b2-default')}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer active:scale-95 ${
-            selectedBranchId === 'b2-default'
-              ? 'bg-gradient-to-r from-amber-600 to-yellow-600 text-stone-950 font-black shadow-xs'
-              : 'bg-[var(--bg-muted)] text-[var(--text-main)] border border-[var(--border-color)]'
-          }`}
-        >
-          Chi nhánh Bình Thạnh
-        </button>
+        {/* Lặp qua danh sách chi nhánh lấy từ Backend để render các nút bấm */}
+        {branches.map((b) => (
+          <button
+            key={b.id}
+            type="button"
+            onClick={() => handleFilterBranch(b.id)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer active:scale-95 ${
+              selectedBranchId === b.id
+                ? 'bg-gradient-to-r from-amber-600 to-yellow-600 text-stone-950 font-black shadow-xs'
+                : 'bg-[var(--bg-muted)] text-[var(--text-main)] border border-[var(--border-color)]'
+            }`}
+          >
+            {b.name}
+          </button>
+        ))}
       </div>
 
       {/* Danh sách các bài đánh giá của chi nhánh */}

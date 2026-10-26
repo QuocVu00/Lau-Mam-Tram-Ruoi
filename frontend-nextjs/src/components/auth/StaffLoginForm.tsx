@@ -74,9 +74,9 @@ export default function StaffLoginForm() {
   useEffect(() => {
     const roleParam = searchParams.get('role');
     if (roleParam === 'admin') {
-      executeLogin('admin@laumam.vn', '123456');
+      executeLogin('admin@laumam.vn', 'admin123');
     } else if (roleParam === 'manager') {
-      executeLogin('tung@gmail.com', '123456');
+      executeLogin('manager.q1@laumam.vn', 'manager123');
     }
   }, [searchParams]);
 
@@ -103,7 +103,28 @@ export default function StaffLoginForm() {
         </p>
       </div>
 
+      {/* 2 Nút Đăng nhập nhanh 1 chạm cho Demo & Thử nghiệm */}
+      <div className="grid grid-cols-2 gap-2.5 mb-5 p-2 bg-stone-950/80 rounded-2xl border border-stone-800">
+        <button
+          type="button"
+          onClick={() => executeLogin('admin@laumam.vn', 'admin123')}
+          disabled={isLoading}
+          className="p-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-left transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+        >
+          <span className="block text-[11px] font-black uppercase text-amber-400">1-Chạm Admin</span>
+          <span className="block text-[10px] text-stone-400 truncate">admin@laumam.vn</span>
+        </button>
 
+        <button
+          type="button"
+          onClick={() => executeLogin('manager.q1@laumam.vn', 'manager123')}
+          disabled={isLoading}
+          className="p-2.5 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 text-orange-300 text-left transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+        >
+          <span className="block text-[11px] font-black uppercase text-orange-400">1-Chạm Quản Lý Q1</span>
+          <span className="block text-[10px] text-stone-400 truncate">manager.q1@...</span>
+        </button>
+      </div>
 
       {/* Thông báo lỗi */}
       {errorMessage && (
