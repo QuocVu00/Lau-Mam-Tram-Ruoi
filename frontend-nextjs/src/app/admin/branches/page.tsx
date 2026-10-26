@@ -104,21 +104,9 @@ export default function AdminBranchesPage() {
               <Store className="h-6 w-6 text-amber-500" />
               <span>Tổng Quan & Quản Lý Chi Nhánh</span>
             </h1>
-            <p className="text-xs md:text-sm text-neutral-400 mt-1">
-              Theo dõi điểm đánh giá thực tế và quản lý mạng lưới nhà hàng Lẩu Mắm Trăm Rưỡi
-            </p>
           </div>
 
           <div className="flex items-center gap-2.5">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={fetchBranches}
-              disabled={isLoading}
-            >
-              <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">Làm mới</span>
-            </Button>
             <Button
               variant="primary"
               size="sm"
@@ -145,9 +133,6 @@ export default function AdminBranchesPage() {
               <p className="text-xs text-neutral-400 font-medium group-hover:text-amber-400/90 transition-colors">
                 Điểm sao toàn hệ thống
               </p>
-              <span className="text-[10px] text-amber-500 font-semibold opacity-80 group-hover:opacity-100 flex items-center transition-all">
-                Xem tóm tắt sao →
-              </span>
             </div>
             <p className="text-2xl font-black text-amber-400 mt-1 flex items-center gap-1.5">
               <Star className="h-5 w-5 fill-amber-400" />
@@ -167,9 +152,6 @@ export default function AdminBranchesPage() {
               <p className="text-xs text-neutral-400 font-medium group-hover:text-amber-400/90 transition-colors">
                 Tổng bài đánh giá hợp lệ
               </p>
-              <span className="text-[10px] text-amber-500 font-semibold opacity-80 group-hover:opacity-100 flex items-center transition-all">
-                Xem toàn bộ đánh giá →
-              </span>
             </div>
             <p className="text-2xl font-black text-white mt-1 group-hover:text-amber-300 transition-colors">
               {branches.reduce((acc, b) => acc + b.totalActiveReviews, 0)}
@@ -182,9 +164,8 @@ export default function AdminBranchesPage() {
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-bold text-neutral-300 uppercase tracking-wider flex items-center gap-2">
               <ClipboardCheck className="w-4 h-4 text-amber-500" />
-              <span>Danh Sách Chi Nhánh (Nhấp vào chi nhánh để kiểm tra công việc)</span>
+              <span>Danh Sách Chi Nhánh</span>
             </h2>
-            <span className="text-xs text-amber-400 font-medium">Bấm vào thẻ để xem đơn & đánh giá</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -222,14 +203,6 @@ export default function AdminBranchesPage() {
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-neutral-800 flex items-center justify-between text-xs text-neutral-400">
-                  <span className="text-[11px] text-neutral-500">Mã ID: {b.id.slice(0, 8)}...</span>
-                  <div className="flex items-center gap-1.5 text-amber-400 font-bold group-hover:translate-x-1 transition-transform">
-                    <Eye className="w-3.5 h-3.5" />
-                    <span>Kiểm tra công việc</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </div>
-                </div>
               </Card>
             ))}
           </div>

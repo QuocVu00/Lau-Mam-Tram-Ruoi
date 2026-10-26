@@ -23,6 +23,13 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+interface NavItem {
+  title: string;
+  href: string;
+  icon: any;
+  badge?: string;
+}
+
 interface AdminSidebarProps {
   role?: 'MANAGER' | 'ADMIN';
   branchName?: string;
@@ -41,7 +48,7 @@ export function AdminSidebar({ role = 'ADMIN', branchName }: AdminSidebarProps) 
     router.push('/login');
   };
 
-  const adminNav = [
+  const adminNav: NavItem[] = [
     {
       title: 'Quản lý Chi nhánh',
       href: '/admin/branches',
@@ -58,7 +65,7 @@ export function AdminSidebar({ role = 'ADMIN', branchName }: AdminSidebarProps) 
       icon: MessageSquare,
     },
     {
-      title: 'Quản lý Nhân sự (Role 2)',
+      title: 'Quản lý Nhân sự',
       href: '/admin/staff',
       icon: Users,
     },
@@ -66,11 +73,10 @@ export function AdminSidebar({ role = 'ADMIN', branchName }: AdminSidebarProps) 
       title: 'Lịch sử xóa đánh giá',
       href: '/admin/logs',
       icon: MessageSquareWarning,
-      badge: 'Admin Only',
     },
   ];
 
-  const managerNav = [
+  const managerNav: NavItem[] = [
     {
       title: 'Đơn Đặt bàn Realtime',
       href: '/manager/bookings',
@@ -90,21 +96,23 @@ export function AdminSidebar({ role = 'ADMIN', branchName }: AdminSidebarProps) 
     <aside className="w-full md:w-64 border-b md:border-b-0 md:border-r border-neutral-800 bg-neutral-950 p-4 shrink-0 flex flex-col justify-between">
       <div className="space-y-6">
         {/* Brand & Role Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-neutral-800">
-          <div>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-amber-500" />
-              <span className="font-extrabold text-sm text-white uppercase tracking-wider">
-                {role === 'ADMIN' ? 'Hệ Thống Admin' : 'Quản Lý Quán'}
-              </span>
+        {role !== 'ADMIN' && (
+          <div className="flex items-center justify-between pb-3 border-b border-neutral-800">
+            <div>
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-amber-500" />
+                <span className="font-extrabold text-sm text-white uppercase tracking-wider">
+                  Quản Lý Quán
+                </span>
+              </div>
+              {branchName && (
+                <p className="text-xs text-neutral-400 mt-1 truncate max-w-[200px]">
+                  Chi nhánh: <span className="text-amber-400 font-medium">{branchName}</span>
+                </p>
+              )}
             </div>
-            {branchName && (
-              <p className="text-xs text-neutral-400 mt-1 truncate max-w-[200px]">
-                Chi nhánh: <span className="text-amber-400 font-medium">{branchName}</span>
-              </p>
-            )}
           </div>
-        </div>
+        )}
 
         {/* Navigation Links: Tự động xếp ngang trên mobile có vuốt mượt, xếp dọc trên máy tính */}
         <nav className="flex flex-row md:flex-col gap-1.5 overflow-x-auto md:overflow-visible pb-1 md:pb-0 scrollbar-none">
@@ -139,17 +147,10 @@ export function AdminSidebar({ role = 'ADMIN', branchName }: AdminSidebarProps) 
 
       {/* Footer Navigation: Xếp ngang trên mobile, xếp dọc trên máy tính */}
       <div className="pt-3 md:pt-4 border-t border-neutral-800 flex flex-row md:flex-col items-center md:items-stretch justify-between md:justify-start gap-2 mt-3 md:mt-4">
-        <Link
-          href="/"
-          className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 md:py-2 text-xs text-neutral-400 hover:text-neutral-200 transition-colors rounded-lg hover:bg-neutral-900"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          <span>Về trang chủ</span>
-        </Link>
         <button
           type="button"
           onClick={handleLogout}
-          className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 md:py-2 text-xs text-red-400 hover:text-red-300 transition-colors rounded-lg hover:bg-red-950/20 cursor-pointer"
+          className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 md:py-2 text-xs text-red-400 hover:text-red-300 transition-colors rounded-lg hover:bg-red-950/20 cursor-pointer w-full"
         >
           <LogOut className="h-3.5 w-3.5" />
           <span>Đăng xuất</span>

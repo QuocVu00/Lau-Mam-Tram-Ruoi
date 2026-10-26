@@ -97,26 +97,10 @@ export default function AdminLogsPage() {
         {/* Header Admin */}
         <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-neutral-900 rounded-2xl border border-neutral-800 shadow-sm">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 bg-red-950/70 border border-red-500/30 text-red-400 text-xs font-bold rounded-md uppercase">
-                Role 3: Super Admin
-              </span>
-              <span className="text-xs text-neutral-400">• {currentUser?.fullName || 'Admin'}</span>
-            </div>
-            <h1 className="text-xl sm:text-2xl font-black text-white mt-1 flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
               <History className="w-6 h-6 text-amber-500" />
               <span>Kiểm Soát Lịch Sử Xóa Đánh Giá</span>
             </h1>
-          </div>
-
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <button
-              onClick={loadLogs}
-              className="p-2.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-xl transition-all cursor-pointer"
-              title="Làm mới"
-            >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-            </button>
           </div>
         </header>
 
@@ -126,7 +110,6 @@ export default function AdminLogsPage() {
             <h2 className="text-sm font-bold text-white">
               Nhật ký xóa của toàn bộ chi nhánh ({logs.length})
             </h2>
-            <span className="text-xs text-neutral-400">Bấm "Xem chi tiết" để xem lại chứng cứ snapshot gốc</span>
           </div>
 
           {logs.length === 0 ? (
