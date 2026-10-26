@@ -135,35 +135,13 @@ function AdminReviewsContent() {
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-neutral-800">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Link
-                href="/admin/branches"
-                className="inline-flex items-center gap-1 text-xs text-amber-500 hover:text-amber-400 font-semibold transition-colors"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Quay lại Quản lý Chi nhánh</span>
-              </Link>
-            </div>
             <h1 className="text-xl md:text-2xl font-extrabold text-white flex items-center gap-2.5">
               <MessageSquare className="h-6 w-6 text-amber-500" />
               <span>Toàn Bộ Bài Đánh Giá Hợp Lệ</span>
             </h1>
-            <p className="text-xs md:text-sm text-neutral-400 mt-1">
-              Xem chi tiết phản hồi thực tế từ thực khách của tất cả các chi nhánh trên toàn hệ thống
-            </p>
           </div>
 
           <div className="flex items-center gap-2.5">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={loadReviewsData}
-              disabled={isLoading}
-            >
-              <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">Làm mới</span>
-            </Button>
-
             <Link href="/admin/ratings">
               <Button variant="secondary" size="sm" className="bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20">
                 <BarChart3 className="h-4 w-4 mr-1.5" />
@@ -244,20 +222,17 @@ function AdminReviewsContent() {
           </div>
         </Card>
 
-        {/* Kết quả số lượng */}
-        <div className="flex items-center justify-between text-xs text-neutral-400 px-1">
-          <span>
-            Đang hiển thị <strong className="text-white font-mono">{filteredReviews.length}</strong> bài đánh giá hợp lệ
-          </span>
-          {searchQuery && (
+        {/* Nút xóa bộ lọc tìm kiếm khi có filter */}
+        {searchQuery && (
+          <div className="flex justify-end text-xs text-neutral-400 px-1">
             <button
               onClick={() => setSearchQuery('')}
               className="text-amber-400 hover:underline"
             >
               Xóa bộ lọc tìm kiếm
             </button>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Danh sách các bài đánh giá */}
         {filteredReviews.length === 0 ? (
@@ -278,7 +253,8 @@ function AdminReviewsContent() {
               return (
                 <Card
                   key={review.id}
-                  className="p-5 bg-neutral-900/70 border-neutral-800 hover:border-neutral-700 rounded-2xl transition-all space-y-3.5 flex flex-col justify-between"
+                  onClick={() => setSelectedReview(review)}
+                  className="p-5 bg-neutral-900/70 border-neutral-800 hover:border-neutral-700 rounded-2xl transition-all space-y-3.5 flex flex-col justify-between cursor-pointer"
                 >
                   <div className="space-y-3">
                     {/* Header bài viết: Tên tác giả + Tên chi nhánh + Số sao */}
@@ -360,22 +336,7 @@ function AdminReviewsContent() {
                     )}
                   </div>
 
-                  {/* Nút xem chi tiết modal */}
-                  <div className="pt-3 border-t border-neutral-800/80 flex items-center justify-between">
-                    <span className="text-[11px] text-emerald-400 flex items-center gap-1 font-medium">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Đánh giá hợp lệ</span>
-                    </span>
 
-                    <button
-                      type="button"
-                      onClick={() => setSelectedReview(review)}
-                      className="text-xs text-amber-400 hover:text-amber-300 font-bold inline-flex items-center gap-1 transition-colors cursor-pointer"
-                    >
-                      <span>Xem chi tiết</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
                 </Card>
               );
             })}

@@ -158,11 +158,8 @@ export default function AdminStaffPage() {
           <div>
             <h1 className="text-xl md:text-2xl font-extrabold text-white flex items-center gap-2.5">
               <Users className="h-6 w-6 text-amber-500" />
-              <span>Quản Lý Tài Khoản Quản Lý (Role 2)</span>
+              <span>Quản Lý Tài Khoản Quản Lý</span>
             </h1>
-            <p className="text-xs md:text-sm text-neutral-400 mt-1">
-              Phân công tài khoản Quản lý phụ trách từng chi nhánh cụ thể
-            </p>
           </div>
 
           <Button
@@ -210,7 +207,7 @@ export default function AdminStaffPage() {
                       </span>
                     </td>
                     <td className="p-4">
-                      <Badge variant="warning">MANAGER</Badge>
+                      <Badge variant="warning">Quản Lí</Badge>
                     </td>
                     <td className="p-4 text-right">
                       <button

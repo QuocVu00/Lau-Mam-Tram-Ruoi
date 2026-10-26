@@ -145,35 +145,13 @@ export default function AdminRatingsSummaryPage() {
         {/* Thanh tiêu đề & nút điều hướng */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-neutral-800">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Link
-                href="/admin/branches"
-                className="inline-flex items-center gap-1 text-xs text-amber-500 hover:text-amber-400 font-semibold transition-colors"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Quay lại Quản lý Chi nhánh</span>
-              </Link>
-            </div>
             <h1 className="text-xl md:text-2xl font-extrabold text-white flex items-center gap-2.5">
               <BarChart3 className="h-6 w-6 text-amber-500" />
               <span>Phân Bố & Tóm Tắt Số Sao Hệ Thống</span>
             </h1>
-            <p className="text-xs md:text-sm text-neutral-400 mt-1">
-              Theo dõi chi tiết số lượng sao từ 1 đến 5 sao theo thời gian thực trên toàn chuỗi
-            </p>
           </div>
 
           <div className="flex items-center gap-2.5">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={fetchData}
-              disabled={isLoading}
-            >
-              <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">Làm mới</span>
-            </Button>
-
             <Link href="/admin/reviews">
               <Button variant="primary" size="sm">
                 <MessageSquare className="h-4 w-4 mr-1.5" />
@@ -214,26 +192,19 @@ export default function AdminRatingsSummaryPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Badge variant="warning" className="text-xs border-amber-500/30 text-amber-400 bg-amber-500/10">
-                {selectedBranchId === 'ALL'
-                  ? 'Toàn bộ chuỗi nhà hàng'
-                  : branches.find((b) => b.id === selectedBranchId)?.name || 'Chi nhánh'}
-              </Badge>
-              {selectedBranchId !== 'ALL' && (
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedBranchId('ALL');
-                  }}
-                  className="text-[11px] font-semibold text-neutral-400 hover:text-white px-2 py-0.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 transition-colors border border-neutral-700"
-                  title="Bấm để xem thống kê toàn bộ chuỗi"
-                >
-                  ✕ Xem toàn chuỗi
-                </button>
-              )}
-            </div>
+            {selectedBranchId !== 'ALL' && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedBranchId('ALL');
+                }}
+                className="text-[11px] font-semibold text-neutral-400 hover:text-white px-2 py-0.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 transition-colors border border-neutral-700"
+                title="Bấm để xem thống kê toàn bộ chuỗi"
+              >
+                ✕ Xem toàn chuỗi
+              </button>
+            )}
           </div>
 
           {/* Nội dung widget 2 cột */}
@@ -319,7 +290,6 @@ export default function AdminRatingsSummaryPage() {
               <Award className="w-4 h-4 text-amber-500" />
               <span>Bảng Thống Kê Điểm Số Từng Chi Nhánh</span>
             </h3>
-            <span className="text-xs text-neutral-400">Dữ liệu tính từ bài đánh giá đang hoạt động</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
