@@ -42,37 +42,40 @@ async function main() {
   });
   console.log(`✅ Đã tạo chi nhánh: ${branchQ2.name}`);
 
-  // Bước 2: Băm mật khẩu bằng thuật toán bcrypt (độ khó vòng lặp: 10)
-  const adminPasswordHash = await bcrypt.hash('admin123', 10);
-  const managerPasswordHash = await bcrypt.hash('manager123', 10);
+  // Bước 2: Băm mật khẩu chung 123456 bằng thuật toán bcrypt (độ khó vòng lặp: 10)
+  const defaultPasswordHash = await bcrypt.hash('123456', 10);
 
-  // Bước 3: Tạo tài khoản Quản trị viên tối cao (Role 3: ADMIN)
+  // Bước 3: Tạo/cập nhật tài khoản Quản trị viên tối cao (Role 3: ADMIN)
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@laumam.vn' },
-    update: {},
+    where: { email: 'admin@gmail.com' },
+    update: {
+      passwordHash: defaultPasswordHash, // Cập nhật lại mật khẩu mới nếu tài khoản đã có
+    },
     create: {
-      email: 'admin@laumam.vn',
+      email: 'admin@gmail.com',
       fullName: 'Quản Trị Viên Tối Cao',
-      passwordHash: adminPasswordHash,
+      passwordHash: defaultPasswordHash,
       role: Role.ADMIN,
       branchId: null, // Admin quản lý toàn chuỗi nên không thuộc riêng chi nhánh nào
     },
   });
-  console.log(`✅ Đã tạo tài khoản Admin: ${admin.email} (Mật khẩu: admin123)`);
+  console.log(`✅ Đã tạo tài khoản Admin: ${admin.email} (Mật khẩu: 123456)`);
 
-  // Bước 4: Tạo tài khoản Quản lý chi nhánh Quận 1 (Role 2: MANAGER)
+  // Bước 4: Tạo/cập nhật tài khoản Quản lý chi nhánh Quận 1 (Role 2: MANAGER)
   const manager = await prisma.user.upsert({
-    where: { email: 'manager.q1@laumam.vn' },
-    update: {},
+    where: { email: 'quanly1@gmail.com' },
+    update: {
+      passwordHash: defaultPasswordHash, // Cập nhật lại mật khẩu mới nếu tài khoản đã có
+    },
     create: {
-      email: 'manager.q1@laumam.vn',
-      fullName: 'Nguyễn Văn Quản Lý (Q1)',
-      passwordHash: managerPasswordHash,
+      email: 'quanly1@gmail.com',
+      fullName: 'Quản Lý Chi Nhánh 1',
+      passwordHash: defaultPasswordHash,
       role: Role.MANAGER,
       branchId: branchQ1.id, // Bắt buộc gán vào chi nhánh Quận 1
     },
   });
-  console.log(`✅ Đã tạo tài khoản Quản lý: ${manager.email} (Mật khẩu: manager123)`);
+  console.log(`✅ Đã tạo tài khoản Quản lý: ${manager.email} (Mật khẩu: 123456)`);
 
   // Bước 5: Tạo tài khoản khách hàng mẫu và bài đánh giá đầu tiên
   const customer = await prisma.user.upsert({
