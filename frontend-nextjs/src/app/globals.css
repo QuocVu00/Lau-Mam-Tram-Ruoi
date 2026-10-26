@@ -109,3 +109,9 @@ div[data-nextjs-dialog-overlay] {
   opacity: 0 !important;
   pointer-events: none !important;
 }
+
+/* Ẩn nút hiện mật khẩu mặc định của Edge/IE trên Windows để tránh xung đột */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
