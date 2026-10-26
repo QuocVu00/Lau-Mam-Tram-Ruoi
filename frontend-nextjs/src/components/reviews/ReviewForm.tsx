@@ -8,9 +8,10 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Star, Image as ImageIcon, Camera, Video, X, Send, Play } from 'lucide-react';
+import { Star, Image as ImageIcon, Camera, Video, X, Send, Play, Sparkles } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 import { IReviewMedia } from '@/lib/contracts';
+import { getOrSetAutoCustomerIdentity } from '@/lib/utils';
 
 // Kiểu dữ liệu lưu trữ media tạm thời trên bộ nhớ trình duyệt của khách
 interface LocalMediaItem {
@@ -29,6 +30,11 @@ export default function ReviewForm({ branchId, onSuccess, onClose }: ReviewFormP
   // 1. Quản lý trạng thái đánh giá: Số sao (1 - 5) và hiệu ứng hover
   const [rating, setRating] = useState<number>(5);
   const [hoverRating, setHoverRating] = useState<number>(0);
+
+  // Tự động nhận diện thiết bị (Android Google / iOS Safari) để gán tên độc nhất, khách không cần gõ
+  const [customerName, setCustomerName] = useState<string>(() => {
+    return getOrSetAutoCustomerIdentity().fullName;
+  });
 
   // 2. Nội dung lời nhận xét món ăn của thực khách
   const [content, setContent] = useState<string>('');
@@ -111,17 +117,29 @@ export default function ReviewForm({ branchId, onSuccess, onClose }: ReviewFormP
       return;
     }
 
+    // Kiểm tra tên người đánh giá
+    const finalCustomerName = customerName.trim() || 'Thực Khách Thân Thiết';
+
     setIsLoading(true);
     setError('');
 
     try {
-      // Đảm bảo có access_token hợp lệ từ backend (thay thế token giả nếu có)
+      // Đảm bảo khách hàng có Token chuẩn tương ứng với Tên người viết
       let token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-      if (!token || token.startsWith('demo_customer_token_') || token.startsWith('demo_phone_token_')) {
+      let currentUserInfoStr = typeof window !== 'undefined' ? localStorage.getItem('user_info') : null;
+      let currentUser = currentUserInfoStr ? JSON.parse(currentUserInfoStr) : null;
+
+      // Nếu chưa có token hoặc khách đổi sang một tên mới khác với tên đăng nhập cũ
+      if (!token || !currentUser || currentUser.fullName !== finalCustomerName) {
+        const email = `${finalCustomerName.toLowerCase().replace(/\s+/g, '')}@khachhang.laumam.vn`;
+        const credential = `customer_auth_${encodeURIComponent(email)}_${encodeURIComponent(finalCustomerName)}`;
+
         const authRes: any = await apiClient('/auth/google', {
           method: 'POST',
-          body: JSON.stringify({ credential: 'demo_google_one_tap' }),
+          body: JSON.stringify({ credential }),
         });
+
+        token = authRes.accessToken;
         localStorage.setItem('access_token', authRes.accessToken);
         localStorage.setItem('user_info', JSON.stringify(authRes.user));
         if (typeof window !== 'undefined') {
@@ -150,43 +168,7 @@ export default function ReviewForm({ branchId, onSuccess, onClose }: ReviewFormP
       onSuccess();
       onClose();
     } catch (err: any) {
-      // Nếu token hết hạn hoặc không hợp lệ, thử làm mới token tự động 1 lần
-      if (err.message && err.message.includes('Phiên đăng nhập không hợp lệ')) {
-        try {
-          const authRes: any = await apiClient('/auth/google', {
-            method: 'POST',
-            body: JSON.stringify({ credential: 'demo_google_one_tap' }),
-          });
-          localStorage.setItem('access_token', authRes.accessToken);
-          localStorage.setItem('user_info', JSON.stringify(authRes.user));
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new Event('auth_changed'));
-          }
-
-          const formattedMedia: IReviewMedia[] = mediaList.map((item) => ({
-            type: item.type,
-            url: item.url,
-          }));
-
-          await apiClient('/reviews', {
-            method: 'POST',
-            body: JSON.stringify({
-              branchId,
-              rating,
-              content: content.trim(),
-              mediaUrls: formattedMedia,
-            }),
-          });
-
-          onSuccess();
-          onClose();
-          return;
-        } catch (retryErr: any) {
-          setError(retryErr.message || 'Lỗi khi gửi đánh giá, vui lòng thử lại!');
-        }
-      } else {
-        setError(err.message || 'Bạn cần đăng nhập để gửi bài đánh giá!');
-      }
+      setError(err.message || 'Lỗi khi gửi bài đánh giá!');
     } finally {
       setIsLoading(false);
     }
@@ -253,8 +235,22 @@ export default function ReviewForm({ branchId, onSuccess, onClose }: ReviewFormP
             </span>
           </div>
 
+          {/* Khóa cứng tên thực khách - Chỉ hiển thị đúng tên người đánh giá, không có chữ phụ */}
+          <div className="p-3 bg-stone-950 border border-stone-800 rounded-xl flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-600 to-yellow-500 flex items-center justify-center text-stone-950 text-xs font-black uppercase shadow-xs shrink-0">
+              {customerName.charAt(0) || 'K'}
+            </div>
+            <div className="truncate">
+              <p className="text-[10px] text-stone-500 font-medium">Người đánh giá:</p>
+              <p className="text-xs font-black text-amber-400 truncate">{customerName}</p>
+            </div>
+          </div>
+
           {/* 2. Ô nhập cảm nhận thực khách */}
           <div>
+            <label className="block text-xs font-bold text-stone-300 mb-1">
+              Cảm nhận về món ăn <span className="text-amber-500">*</span>
+            </label>
             <textarea
               rows={3}
               value={content}

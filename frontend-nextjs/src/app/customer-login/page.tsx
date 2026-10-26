@@ -18,14 +18,23 @@ export default function CustomerLoginPage() {
   const [phone, setPhone] = useState('');
   const [fullName, setFullName] = useState('');
 
-  // Đăng nhập nhanh cho khách vãng lai bằng Google
+  // Đăng nhập khách hàng bằng tài khoản Google
   const handleGoogleLogin = async () => {
+    const customerName = fullName.trim() || prompt('Vui lòng nhập tên của bạn để hiển thị khi đánh giá:') || '';
+    if (!customerName.trim()) {
+      alert('Vui lòng nhập họ và tên của bạn!');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
+      const email = `${customerName.toLowerCase().replace(/\s+/g, '')}@gmail.com`;
+      const credential = `customer_auth_${encodeURIComponent(email)}_${encodeURIComponent(customerName.trim())}`;
+      
       const res: any = await apiClient('/auth/google', {
         method: 'POST',
-        body: JSON.stringify({ credential: 'demo_google_one_tap' }),
+        body: JSON.stringify({ credential }),
       });
 
       localStorage.setItem('access_token', res.accessToken);
@@ -34,15 +43,15 @@ export default function CustomerLoginPage() {
         window.dispatchEvent(new Event('auth_changed'));
       }
 
-      router.push('/'); // Quay lại trang chủ khách vãng lai
+      router.push('/reviews'); // Chuyển sang bảng tin đánh giá
     } catch (err: any) {
-      alert(err.message || 'Lỗi đăng nhập nhanh!');
+      alert(err.message || 'Lỗi đăng nhập nhanh với Google!');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Đăng nhập nhanh bằng tên và số điện thoại
+  // Đăng nhập nhanh bằng tên và số điện thoại / Safari
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phone || !fullName) return;
@@ -62,7 +71,7 @@ export default function CustomerLoginPage() {
         window.dispatchEvent(new Event('auth_changed'));
       }
 
-      router.push('/');
+      router.push('/reviews'); // Điều hướng ngay sang trang đánh giá
     } catch (err: any) {
       alert(err.message || 'Lỗi đăng nhập qua số điện thoại!');
     } finally {

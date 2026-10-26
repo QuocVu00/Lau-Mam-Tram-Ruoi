@@ -99,13 +99,21 @@ export class AuthService {
     const isMockOrDev =
       !googleClientId ||
       googleClientId.includes('your-google-client-id') ||
-      credential.startsWith('demo_');
+      googleClientId.includes('dummy-google-client-id') ||
+      credential.startsWith('demo_') ||
+      credential.startsWith('customer_auth_');
 
     if (isMockOrDev) {
       let demoEmail = 'thuc.khach@gmail.com';
-      let demoName = 'Thực Khách Sành Ăn';
+      let demoName = 'Thực Khách';
 
-      if (credential.startsWith('demo_phone_')) {
+      // Xử lý đăng nhập khách hàng có truyền tên và email cụ thể (Google, Safari, Apple, Số điện thoại)
+      if (credential.startsWith('customer_auth_')) {
+        // Định dạng: customer_auth_EMAIL_ENCODEDNAME
+        const parts = credential.split('_');
+        demoEmail = parts[2] ? decodeURIComponent(parts[2]) : 'khach@gmail.com';
+        demoName = parts[3] ? decodeURIComponent(parts[3]) : 'Thực Khách';
+      } else if (credential.startsWith('demo_phone_')) {
         const parts = credential.split('_');
         const phone = parts[2] || '0901234567';
         const rawName = parts[3] ? decodeURIComponent(parts[3]) : 'Thực Khách';
@@ -114,8 +122,8 @@ export class AuthService {
       }
 
       payloadGoogle = {
-        email: demoEmail,
-        name: demoName,
+        email: demoEmail.toLowerCase().trim(),
+        name: demoName.trim(),
         picture: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80',
       };
     } else {
