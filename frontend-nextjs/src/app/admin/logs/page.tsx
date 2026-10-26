@@ -28,8 +28,7 @@ export default function AdminLogsPage() {
       const token = localStorage.getItem('access_token');
 
       if (!token || !userStr) {
-        // Fallback for mock demo if token isn't yet set
-        setCurrentUser({ fullName: 'Super Admin', role: 'ADMIN' });
+        router.push('/login');
         return;
       }
 

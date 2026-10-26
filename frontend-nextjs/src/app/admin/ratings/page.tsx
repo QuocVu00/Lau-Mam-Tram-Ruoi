@@ -183,60 +183,57 @@ export default function AdminRatingsSummaryPage() {
           </div>
         </div>
 
-        {/* Thanh chọn chi nhánh để xem tóm tắt */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
-          <button
-            type="button"
-            onClick={() => setSelectedBranchId('ALL')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+        {/* ============================================================= */}
+        {/* KHỐI TRỌNG TÂM: WIDGET "TÓM TẮT BÀI ĐÁNH GIÁ"                 */}
+        {/* Bấm vào khối tóm tắt chuyển thẳng sang trang danh sách bài viết */}
+        {/* ============================================================= */}
+        <Card
+          onClick={() => {
+            const targetUrl =
               selectedBranchId === 'ALL'
-                ? 'bg-amber-500 text-neutral-950 shadow-md shadow-amber-500/20'
-                : 'bg-neutral-900 text-neutral-400 hover:text-white border border-neutral-800'
-            }`}
-          >
-            Toàn Hệ Thống ({reviews.length})
-          </button>
-          {branches.map((b) => (
-            <button
-              key={b.id}
-              type="button"
-              onClick={() => setSelectedBranchId(b.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
-                selectedBranchId === b.id
-                  ? 'bg-amber-500 text-neutral-950 shadow-md shadow-amber-500/20'
-                  : 'bg-neutral-900 text-neutral-400 hover:text-white border border-neutral-800'
-              }`}
-            >
-              <Store className="w-3.5 h-3.5" />
-              <span>{b.name}</span>
-              <span className="text-[10px] opacity-75 font-mono">({b.totalActiveReviews || 0})</span>
-            </button>
-          ))}
-        </div>
-
-        {/* ============================================================= */}
-        {/* KHỐI TRỌNG TÂM: WIDGET "TÓM TẮT BÀI ĐÁNH GIÁ" (THEO ẢNH MẪU)    */}
-        {/* ============================================================= */}
-        <Card className="p-6 bg-neutral-900/90 border-neutral-800 shadow-xl rounded-2xl relative overflow-hidden">
+                ? '/admin/reviews'
+                : `/admin/reviews?branchId=${selectedBranchId}`;
+            router.push(targetUrl);
+          }}
+          className="p-6 bg-neutral-900/90 border-neutral-800 hover:border-amber-500/50 hover:bg-neutral-900/95 shadow-xl rounded-2xl relative overflow-hidden cursor-pointer transition-all duration-200 group"
+          title="Bấm vào để xem danh sách bài đánh giá"
+        >
           {/* Header Card */}
           <div className="flex items-center justify-between pb-4 border-b border-neutral-800">
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-white tracking-tight">
-                Tóm tắt bài đánh giá
+              <h2 className="text-base font-bold text-white tracking-tight group-hover:text-amber-400 transition-colors flex items-center gap-1.5">
+                <span>Tóm tắt bài đánh giá</span>
+                <ChevronRight className="w-4 h-4 text-neutral-500 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
               </h2>
               <div
                 title="Tỉ lệ phân bố điểm đánh giá tính từ toàn bộ nhận xét hợp lệ của thực khách"
                 className="text-neutral-400 hover:text-neutral-200 cursor-help"
+                onClick={(e) => e.stopPropagation()}
               >
                 <HelpCircle className="w-4 h-4" />
               </div>
             </div>
 
-            <Badge variant="warning" className="text-xs border-amber-500/30 text-amber-400 bg-amber-500/10">
-              {selectedBranchId === 'ALL'
-                ? 'Toàn bộ chuỗi nhà hàng'
-                : branches.find((b) => b.id === selectedBranchId)?.name || 'Chi nhánh'}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="warning" className="text-xs border-amber-500/30 text-amber-400 bg-amber-500/10">
+                {selectedBranchId === 'ALL'
+                  ? 'Toàn bộ chuỗi nhà hàng'
+                  : branches.find((b) => b.id === selectedBranchId)?.name || 'Chi nhánh'}
+              </Badge>
+              {selectedBranchId !== 'ALL' && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedBranchId('ALL');
+                  }}
+                  className="text-[11px] font-semibold text-neutral-400 hover:text-white px-2 py-0.5 rounded-lg bg-neutral-800 hover:bg-neutral-700 transition-colors border border-neutral-700"
+                  title="Bấm để xem thống kê toàn bộ chuỗi"
+                >
+                  ✕ Xem toàn chuỗi
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Nội dung widget 2 cột */}
@@ -306,15 +303,11 @@ export default function AdminRatingsSummaryPage() {
                 })}
               </div>
 
-              {/* Liên kết màu xanh chuyển sang danh sách bài viết */}
-              <Link
-                href={selectedBranchId === 'ALL' ? '/admin/reviews' : `/admin/reviews?branchId=${selectedBranchId}`}
-                className="text-sm font-semibold text-cyan-400 hover:text-cyan-300 hover:underline inline-flex items-center gap-1 transition-colors group cursor-pointer"
-              >
+              {/* Số lượng bài viết */}
+              <div className="text-sm font-semibold text-cyan-400 group-hover:text-cyan-300 inline-flex items-center gap-1 transition-colors">
                 <span>{stats.total} bài viết</span>
                 <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-              <p className="text-[10px] text-neutral-500 mt-1">Bấm để xem danh sách chi tiết</p>
+              </div>
             </div>
           </div>
         </Card>
@@ -339,7 +332,7 @@ export default function AdminRatingsSummaryPage() {
               return (
                 <Card
                   key={b.id}
-                  onClick={() => setSelectedBranchId(b.id)}
+                  onClick={() => setSelectedBranchId(selectedBranchId === b.id ? 'ALL' : b.id)}
                   className={`p-4 transition-all cursor-pointer border ${
                     selectedBranchId === b.id
                       ? 'bg-neutral-900 border-amber-500 shadow-md shadow-amber-500/10'

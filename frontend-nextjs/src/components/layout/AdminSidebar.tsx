@@ -8,7 +8,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Store,
   Users,
@@ -30,6 +30,16 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ role = 'ADMIN', branchName }: AdminSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('user_info');
+      window.dispatchEvent(new Event('auth_changed'));
+    }
+    router.push('/login');
+  };
 
   const adminNav = [
     {
@@ -136,13 +146,14 @@ export function AdminSidebar({ role = 'ADMIN', branchName }: AdminSidebarProps) 
           <ArrowLeft className="h-3.5 w-3.5" />
           <span>Về trang chủ</span>
         </Link>
-        <Link
-          href="/login"
-          className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 md:py-2 text-xs text-red-400 hover:text-red-300 transition-colors rounded-lg hover:bg-red-950/20"
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1.5 md:py-2 text-xs text-red-400 hover:text-red-300 transition-colors rounded-lg hover:bg-red-950/20 cursor-pointer"
         >
           <LogOut className="h-3.5 w-3.5" />
           <span>Đăng xuất</span>
-        </Link>
+        </button>
       </div>
     </aside>
   );
