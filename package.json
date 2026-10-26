@@ -1,4 +1,12 @@
 {
+  "name": "lau-mam-tram-ruoi",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "docker": "docker compose up -d",
+    "backend": "npm --prefix backend-nestjs run dev",
+    "frontend": "npm --prefix frontend-nextjs run dev"
+  },
   "dependencies": {
     "clsx": "^2.1.1",
     "framer-motion": "^14.6.0",

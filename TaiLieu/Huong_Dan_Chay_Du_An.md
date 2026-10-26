@@ -1,6 +1,6 @@
 # 📖 HƯỚNG DẪN CÀI ĐẶT VÀ CHẠY DỰ ÁN LẨU MẮM TRĂM RƯỠI
 
-Tài liệu này hướng dẫn chi tiết từng bước (Step-by-Step) cho người mới bắt đầu để thiết lập và khởi chạy toàn bộ hệ thống từ mã nguồn.
+Tài liệu này hướng dẫn chi tiết quy trình khởi chạy dự án cực kỳ tinh gọn: **Chỉ cần đúng 3 lệnh từ thư mục gốc của dự án** (`Lau-Mam-Tram-Ruoi`).
 
 ---
 
@@ -13,72 +13,71 @@ Dự án gồm 2 phần chính và 1 dịch vụ cơ sở dữ liệu:
 
 ---
 
-## ⚙️ 2. Yêu Cầu Môi Trường Cài Đặt (Prerequisites)
+## ⚙️ 2. Yêu Cầu Môi Trường (Prerequisites)
 
-Trước khi bắt đầu, hãy đảm bảo máy tính đã cài đặt các công cụ sau:
-1. **Node.js**: Phiên bản LTS khuyến nghị `v18.x` hoặc `v20.x` trở lên ([Tải tại đây](https://nodejs.org/)).
+Trước khi bắt đầu, hãy đảm bảo máy tính đã cài đặt:
+1. **Node.js**: Phiên bản LTS khuyến nghị `v18.x`, `v20.x` trở lên ([Tải tại đây](https://nodejs.org/)).
 2. **Git**: Dùng để quản lý mã nguồn ([Tải tại đây](https://git-scm.com/)).
-3. **Docker Desktop**: Dùng để chạy cơ sở dữ liệu PostgreSQL nhanh chóng mà không cần cài đặt phức tạp ([Tải tại đây](https://www.docker.com/products/docker-desktop/)).
+3. **Docker Desktop**: Dùng để chạy cơ sở dữ liệu PostgreSQL tự động ([Tải tại đây](https://www.docker.com/products/docker-desktop/)).
 
 ---
 
-## 🚀 3. Các Bước Chạy Dự Án Chi Tiết
+## 🚀 3. Khởi Chạy Dự Án Cực Nhanh (3 Lệnh Duy Nhất)
 
-### 🔹 Bước 1: Khởi động Cơ Sở Dữ Liệu PostgreSQL (Docker)
+> 💡 **Lưu ý:** Bạn chỉ cần mở terminal đứng **ngay tại thư mục gốc của dự án** (`Lau-Mam-Tram-Ruoi`), không cần phải gõ lệnh chuyển thư mục `cd` thủ công!
 
-Mở một cửa sổ Terminal (PowerShell hoặc Command Prompt) tại thư mục gốc của dự án (`Lau-Mam-Tram-Ruoi`):
+Mở **3 tab Terminal riêng biệt** trong VS Code hoặc PowerShell:
 
-```powershell
-# Khởi chạy container PostgreSQL chạy ngầm
-docker-compose up -d
+### 🔹 Tab 1: Khởi động Cơ sở dữ liệu Docker
+```bash
+npm run docker
 ```
+* **Chức năng:** Tự động kích hoạt container PostgreSQL `lau_mam_postgres` chạy ngầm trên cổng `5432`.
 
-### 🔹 Bước 2: Cài Đặt và Khởi Động Backend (NestJS)
+---
 
-Mở Terminal thứ 2 để chạy Backend:
-
-```powershell
-# 1. Di chuyển vào thư mục backend-nestjs
-cd backend-nestjs
-
-# 2. Cài đặt các thư viện phụ thuộc (Dependencies)
-npm install
-
-# 3. Tạo cấu trúc bảng và đồng bộ schema vào cơ sở dữ liệu PostgreSQL
-npm run prisma:push
-
-# 4. Sinh bộ client Prisma mã nguồn TypeScript
-npm run prisma:generate
-
-# 5. Khởi chạy server Backend ở chế độ phát triển (Development / Watch)
-npm run start:dev
+### 🔹 Tab 2: Khởi động Backend (NestJS)
+```bash
+npm run backend
 ```
+* **Chức năng:** 
+  - Tự động đồng bộ cấu trúc bảng vào PostgreSQL (`prisma db push`).
+  - Tự động gieo mầm dữ liệu mẫu ban đầu (`seed`): tạo sẵn 2 chi nhánh mẫu, tài khoản Quản trị Admin, Quản lý chi nhánh, và bài đánh giá ban đầu.
+  - Bật máy chủ NestJS Backend tại cổng `http://localhost:3001` (chế độ tự động reload khi sửa code).
 
-### 🔹 Bước 3: Cài Đặt và Khởi Động Frontend (Next.js)
+---
 
-Mở Terminal thứ 3 để chạy Frontend:
-
-```powershell
-# 1. Di chuyển vào thư mục frontend-nextjs
-cd frontend-nextjs
-
-# 2. Cài đặt các thư viện phụ thuộc
-npm install
-
-# 3. Khởi chạy máy chủ phát triển Next.js
-npm run dev
+### 🔹 Tab 3: Khởi động Frontend (Next.js)
+```bash
+npm run frontend
 ```
+* **Chức năng:** Khởi chạy máy chủ giao diện Next.js tại cổng `http://localhost:3000`.
 
-## 🌐 4. Truy Cập Hệ Thống
+---
 
-Sau khi cả 2 server đều đang chạy:
+## 🌐 4. Các Đường Dẫn Truy Cập & Tài Khoản Mẫu
 
-| Thành phần | Địa chỉ truy cập (URL) | Ghi chú |
+Sau khi chạy xong 3 lệnh trên, bạn mở trình duyệt và trải nghiệm:
+
+| Giao diện | Địa chỉ truy cập (URL) | Mô tả tính năng |
 | :--- | :--- | :--- |
-| **Giao diện Khách Hàng (Customer)** | `http://localhost:3000` | Trang giới thiệu món ăn, chọn chi nhánh, đặt bàn/mang về qua Zalo |
-| **Trang Đánh Giá Khách Hàng** | `http://localhost:3000/reviews` | Bảng tin đánh giá, lọc theo chi nhánh, xem chi tiết và phản hồi |
-| **Giao diện Quản Trị (Admin/Staff)** | `http://localhost:3000/admin` | Quản lý đánh giá và đơn đặt bàn |
-| **Backend API Server** | `http://localhost:3001` | Cổng API NestJS cung cấp dữ liệu |
-| **Prisma Studio (Xem dữ liệu trực quan)** | `npm run prisma:studio` (chạy trong thư mục `backend-nestjs`) | Mở trang `http://localhost:5555` để duyệt dữ liệu các bảng |
+| **Trang chủ Khách Hàng** | [http://localhost:3000](http://localhost:3000) | Giới thiệu quán, chọn chi nhánh (Quận 1, Bình Thạnh), Đặt bàn / Mang về qua Zalo |
+| **Bảng tin Đánh Giá** | [http://localhost:3000/reviews](http://localhost:3000/reviews) | Xem đánh giá thực khách, lọc theo từng chi nhánh, viết đánh giá kèm ảnh/video |
+| **Trang Đăng Nhập Quản Trị** | [http://localhost:3000/login](http://localhost:3000/login) | Cổng đăng nhập dành riêng cho Admin và Quản lý chi nhánh |
+| **Backend API Docs/Check** | [http://localhost:3001/branches](http://localhost:3001/branches) | Kiểm tra trực tiếp API lấy danh sách chi nhánh |
 
 ---
+
+### 🔐 Danh Sách Tài Khoản Đăng Nhập Mẫu
+
+Hệ thống đã nạp sẵn các tài khoản sau vào cơ sở dữ liệu:
+
+1. **Tài khoản Tổng Quản Lý (ADMIN):**
+   - **Email:** `admin@laumam.vn`
+   - **Mật khẩu:** `admin123`
+   - **Quyền hạn:** Quản lý toàn bộ chi nhánh, xem thống kê đánh giá, duyệt xóa đánh giá toàn hệ thống.
+
+2. **Tài khoản Quản Lý Chi Nhánh Quận 1 (MANAGER):**
+   - **Email:** `manager.q1@laumam.vn`
+   - **Mật khẩu:** `manager123`
+   - **Quyền hạn:** Nhận thông báo đặt bàn / đặt mang về theo thời gian thực (Realtime), phản hồi bài đánh giá của chi nhánh Quận 1.
