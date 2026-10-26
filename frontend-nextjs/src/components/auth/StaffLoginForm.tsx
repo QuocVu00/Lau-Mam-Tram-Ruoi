@@ -10,14 +10,13 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Lock, Mail, ShieldAlert, CheckCircle2, ArrowRight, Eye, EyeOff, ShieldCheck, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Lock, Mail, ShieldAlert, CheckCircle2, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 
 export default function StaffLoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   // Trạng thái của các ô nhập liệu
   const [email, setEmail] = useState('');
@@ -70,18 +69,6 @@ export default function StaffLoginForm() {
     }
   };
 
-  // Hỗ trợ gợi ý email và mật khẩu nếu có tham số URL ?role=admin hoặc ?role=manager
-  useEffect(() => {
-    const roleParam = searchParams.get('role');
-    if (roleParam === 'admin') {
-      setEmail('admin@laumam.vn');
-      setPassword('admin123');
-    } else if (roleParam === 'manager') {
-      setEmail('manager.q1@laumam.vn');
-      setPassword('manager123');
-    }
-  }, [searchParams]);
-
   // Xử lý khi submit form thủ công
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,19 +80,13 @@ export default function StaffLoginForm() {
     <div className="w-full max-w-md mx-auto p-6 sm:p-8 bg-stone-900/95 backdrop-blur-md rounded-3xl shadow-2xl border border-amber-500/20 text-stone-100">
       {/* Tiêu đề & Cổng nội bộ */}
       <div className="text-center mb-6">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-bold rounded-full uppercase tracking-wider mb-2.5">
-          <ShieldCheck className="w-4 h-4 text-amber-400" />
-          <span>Cổng Quản Trị Hệ Thống</span>
-        </span>
-        <h1 className="text-2xl font-black text-white tracking-tight">
+        <h1 className="text-2xl font-black text-[#c26910] tracking-tight">
           Lẩu Mắm Trăm Rưỡi
         </h1>
         <p className="text-stone-400 text-xs mt-1">
-          Hệ thống điều hành chuỗi nhà hàng ẩm thực Nam Bộ
+          Lẩu Mắm - Bò Nhúng Giấm - Thịt Cuốn Bánh Tráng
         </p>
       </div>
-
-
 
       {/* Thông báo lỗi */}
       {errorMessage && (
@@ -127,7 +108,7 @@ export default function StaffLoginForm() {
       <form onSubmit={handleSubmit} className="space-y-3.5">
         <div>
           <label className="block text-[11px] font-bold uppercase tracking-wider text-stone-300 mb-1">
-            Tài khoản Email
+            Email
           </label>
           <div className="relative">
             <Mail className="w-4 h-4 text-stone-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -135,7 +116,7 @@ export default function StaffLoginForm() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@laumam.vn hoặc manager@laumam.vn"
+              placeholder=""
               required
               className="w-full pl-10 pr-4 py-2.5 bg-stone-950 border border-stone-800 rounded-xl text-white text-xs placeholder-stone-500 focus:outline-none focus:border-amber-500 transition-colors"
             />
@@ -175,13 +156,10 @@ export default function StaffLoginForm() {
           {isLoading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Đang xác thực thông tin...</span>
+              <span>Đang đăng nhập...</span>
             </>
           ) : (
-            <>
-              <span>Đăng nhập điều hành</span>
-              <ArrowRight className="w-4 h-4" />
-            </>
+            <span>Đăng Nhập</span>
           )}
         </button>
       </form>
