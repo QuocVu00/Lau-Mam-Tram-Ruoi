@@ -101,21 +101,10 @@ export function ReviewFeed({ branchId = '', onSelectReviewBranch }: ReviewFeedPr
 
   return (
     <div className="w-full max-w-xl mx-auto pb-6">
-      {/* 1. Thanh tiêu đề & Nút Viết đánh giá */}
-      <div className="flex items-center justify-between mb-4 px-1">
-        <div>
-          <h2 className="text-base font-black text-[var(--primary)] flex items-center gap-2">
-            <span>Đánh Giá Từ Thực Khách</span>
-          </h2>
-          <p className="text-xs text-[var(--text-sub)]">
-            {branchId && branchId !== 'ALL'
-              ? 'Đang xem bài viết của chi nhánh này'
-              : 'Tổng hợp đánh giá toàn hệ thống (Chạm bài để xem chi tiết)'}
-          </p>
-        </div>
-
-        {/* Nghiệp vụ: Chỉ cho phép viết đánh giá khi đã chọn 1 chi nhánh cụ thể */}
-        {branchId && branchId !== 'ALL' ? (
+      {/* 1. Nút Viết đánh giá (Đã bỏ tiêu đề chữ theo khung đỏ số 2, căn phải nút hành động) */}
+      <div className="flex items-center justify-end mb-4 px-1">
+        {/* Chỉ hiển thị nút Viết đánh giá khi đã chọn 1 chi nhánh cụ thể */}
+        {branchId && branchId !== 'ALL' && (
           <button
             type="button"
             onClick={() => setIsFormOpen(true)}
@@ -124,10 +113,6 @@ export function ReviewFeed({ branchId = '', onSelectReviewBranch }: ReviewFeedPr
             <MessageSquarePlus className="w-4 h-4 text-stone-950" />
             <span>Viết đánh giá</span>
           </button>
-        ) : (
-          <span className="text-[11px] font-semibold text-[var(--text-sub)] bg-[var(--bg-muted)] px-2.5 py-1 rounded-xl border border-[var(--border-color)]">
-            Chỉ xem tổng hợp
-          </span>
         )}
       </div>
 
@@ -171,7 +156,7 @@ export function ReviewFeed({ branchId = '', onSelectReviewBranch }: ReviewFeedPr
               onClick={() => setSelectedReviewForDetail(review)}
               className="p-4 bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] shadow-xs hover:shadow-md transition-all active:scale-[0.98] cursor-pointer group"
             >
-              {/* Thẻ Chi Nhánh gắn trên đầu mỗi bài đánh giá */}
+              {/* Thẻ Chi Nhánh gắn trên đầu mỗi bài đánh giá (Đã bỏ nút 'Chi tiết ->' theo khung đỏ số 3) */}
               <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-[var(--border-color)]">
                 <button
                   type="button"
@@ -188,11 +173,6 @@ export function ReviewFeed({ branchId = '', onSelectReviewBranch }: ReviewFeedPr
                   <Store className="w-3.5 h-3.5 text-[var(--primary)] shrink-0" />
                   <span className="truncate">{branchName}</span>
                 </button>
-
-                <div className="flex items-center gap-1 text-[11px] text-[var(--text-sub)] font-medium shrink-0">
-                  <span>Chi tiết</span>
-                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                </div>
               </div>
 
               {/* Thông tin người đăng */}
@@ -262,11 +242,8 @@ export function ReviewFeed({ branchId = '', onSelectReviewBranch }: ReviewFeedPr
                 </div>
               )}
 
-              {/* Nút hành động trực quan báo hiệu khách có thể bấm xem chi tiết */}
-              <div className="mt-3 pt-2.5 border-t border-[var(--border-color)] flex items-center justify-between text-xs">
-                <span className="text-[11px] text-[var(--text-sub)]">
-                  Chạm để xem chi tiết & tương tác
-                </span>
+              {/* Chân thẻ: Nút Xem bài viết (Đã bỏ dòng chữ gợi ý theo khung đỏ số 4, căn phải) */}
+              <div className="mt-3 pt-2.5 border-t border-[var(--border-color)] flex items-center justify-end text-xs">
                 <span className="inline-flex items-center gap-1 font-bold text-[var(--primary)] group-hover:translate-x-0.5 transition-transform">
                   <span>Xem bài viết</span>
                   <ArrowRight className="w-3.5 h-3.5" />

@@ -9,9 +9,8 @@
  */
 
 import React, { useState, useEffect, Suspense } from 'react';
-import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Store, Star, Award } from 'lucide-react';
+import { Store, Star, Award } from 'lucide-react';
 import { ReviewFeed } from '@/components/reviews/ReviewFeed';
 import { apiClient } from '@/lib/api';
 
@@ -70,32 +69,6 @@ function CustomerReviewsContent() {
   return (
     <div className="space-y-4 transition-colors duration-200">
 
-      {/* Thanh điều hướng quay lại trang giới thiệu */}
-      <div className="flex items-center justify-between pt-1">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--primary)] hover:opacity-80 transition-all bg-[var(--bg-muted)] px-3 py-1.5 rounded-xl border border-[var(--border-color)] active:scale-95"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Về trang chủ</span>
-        </Link>
-
-        <span className="text-[11px] font-bold text-[var(--text-sub)] bg-[var(--bg-muted)] px-2.5 py-1 rounded-xl border border-[var(--border-color)]">
-          Đánh giá thực khách
-        </span>
-      </div>
-
-      {/* Hộp thông báo phân định nghiệp vụ */}
-      {selectedBranchId === 'ALL' && (
-        <div className="p-3.5 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] text-xs text-[var(--text-main)] flex items-center justify-between gap-2 shadow-xs">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping shrink-0" />
-            <span className="text-[11px] leading-relaxed">
-              Mục <strong>Tất cả</strong> để xem tổng hợp. Vui lòng bấm chọn chi nhánh bên dưới để viết đánh giá!
-            </span>
-          </div>
-        </div>
-      )}
 
       {/* Thanh cuộn ngang chọn chi nhánh lọc (Filter Chips) */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
